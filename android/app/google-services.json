@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "661073920531",
+    "project_id": "vitali-1c9b0",
+    "storage_bucket": "vitali-1c9b0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:661073920531:android:5d4a6701f09ee4fc6075e6",
+        "android_client_info": {
+          "package_name": "com.example.vitali"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDIe-Om8oHKZisPme4sX3liUwPOi3JBkOw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
