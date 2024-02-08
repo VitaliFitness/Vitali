@@ -25,7 +25,6 @@ class _LogBottomSheet extends State<LogBottomSheet> {
 
   void fetchFoodItems() async {
     late DataSnapshot snapshot;
-
     if (widget.bottomsheetTitle == "Exercise"){
       snapshot = (await FirebaseDatabase.instance.ref().child('Exercise').get());
       Map<dynamic, dynamic>? data = snapshot.value as Map<dynamic, dynamic>?;
@@ -53,9 +52,10 @@ class _LogBottomSheet extends State<LogBottomSheet> {
               String name = foodKey.toString();
               int calories = foodValue['Calories'];
               String count = foodValue['Count'].toString();
-              double protein = foodValue['Protein'] ?? 0.0;
-              double carbs = foodValue['Carbs'] ?? 0.0;
-              double fat = foodValue['Fat'] ?? 0.0;
+              double protein = (foodValue['Protein'] ?? 0.0).toDouble();
+              double carbs = (foodValue['Carbs'] ?? 0.0).toDouble();
+              double fat = (foodValue['Fat'] ?? 0.0).toDouble();
+              print(carbs);
 
               items.add({'name': name, 'type': type, 'calories': calories, 'count': count,
                 'protein': protein, 'carbs': carbs, 'fat': fat,});
@@ -182,22 +182,36 @@ class _LogBottomSheet extends State<LogBottomSheet> {
                                     //widget.onSelect(item);
                                     showFilteredResults = false;
                                     Navigator.pop(context);
-                                    showDataBottomSheet(
-                                      context,
-                                      bottomsheetTitle: name,
-                                      bottomSheetSubtitile: type,
-                                      mealTime: widget.mealTime,
-                                      count: count,
-                                      calories: calories,
-                                      protein: protein,
-                                      carbs: carbs,
-                                      fat: fat,
-                                      onSelect: (station) {
-                                        setState(() {
-                                          selectedFood = station;
-                                        });
-                                      },
-                                    );
+                                    if (widget.bottomsheetTitle == 'Food') {
+                                      showDataBottomSheetForFood(
+                                        context,
+                                        bottomsheetTitle: name,
+                                        bottomsheetSubtitle: type,
+                                        mealTime: widget.mealTime,
+                                        count: count,
+                                        calories: calories,
+                                        protein: protein,
+                                        carbs: carbs,
+                                        fat: fat,
+                                        onSelect: (station) {
+                                          setState(() {
+                                            selectedFood = station;
+                                          });
+                                        },
+                                      );
+                                    } else{
+                                      print(calories);
+                                      showDataBottomSheetForExercise(
+                                        context,
+                                        bottomsheetTitle: name,
+                                        calories: calories,
+                                        onSelect: (station) {
+                                          setState(() {
+                                            selectedFood = station;
+                                          });
+                                        },
+                                      );
+                                    }
                                   });
                                 },
                               );
