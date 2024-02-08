@@ -1,18 +1,18 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'fitnessdetail_screen.dart';
+import 'login_screen.dart';
 
 
 class SignupDetail extends StatefulWidget {
-  const SignupDetail({Key? key}) : super(key: key);
+  final String email;
+
+  SignupDetail({required this.email});
 
   @override
   State<SignupDetail> createState() => _SignupDetailState();
-}
-
-Future<void> save() async {
-
 }
 
 class _SignupDetailState extends State<SignupDetail> {
@@ -25,6 +25,37 @@ class _SignupDetailState extends State<SignupDetail> {
   TextEditingController heightController = TextEditingController();
   late DateTime selectedDate = DateTime.now();
   late String imagePath;
+
+  Future<void> save(String signupEmail) async {
+    final firestore = FirebaseFirestore.instance.collection('Users');
+
+    String fname = firstNameController.text;
+    String lname = lastNameController.text;
+    String email = signupEmail;
+    String gender = genderController.text;
+    String dob = dobController.text;
+    double weight = double.parse(weightController.text);
+    double height = double.parse(heightController.text);
+
+    firestore.doc(email).set({
+      'First Name' : fname,
+      'Last Name' : lname,
+      'Email Address' : email,
+      'Date of Birth': dob,
+      'Gender' : gender,
+      'Weight' : weight,
+      'Height' : height,
+
+    }).then((value){
+      print('Successfully Registered');
+    }).onError((error, stackTrace){
+      print('Registering User Details Failed');
+      print((error, stackTrace));
+    });
+
+    Navigator.push(
+        context, MaterialPageRoute(builder: (_) => LoginScreen()));
+  }
 
   @override
   void initState(){
@@ -321,7 +352,9 @@ class _SignupDetailState extends State<SignupDetail> {
                         height: 20,
                       ),
                       ElevatedButton(
-                        onPressed: save,
+                        onPressed: (){
+                          save(widget.email);
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF0C2D57),
                           shape: RoundedRectangleBorder(

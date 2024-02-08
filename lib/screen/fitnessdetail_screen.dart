@@ -89,10 +89,10 @@ class _FitnessLevelScreenState extends State<FitnessLevelScreen> {
                   minimumSize: const Size(330, 57),
                 ),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const SignupDetail()),
-                  );
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => const SignupDetail()),
+                  // );
                 },
                 child: const Text("Next",
                   style: TextStyle(

@@ -1,7 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:vitali/screen/signupprofiledetail_screen.dart';
 import 'package:vitali/screen/welcome_screen.dart';
 
+import '../firebase_auth_services.dart';
 import 'login_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -12,14 +15,28 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+
+  final FirebaseAuthService _auth = FirebaseAuthService();
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool isCheck = false;
   bool _obscureText = true;
 
-  Future<void> signup() async{
+  Future<void> authenticateSignup(BuildContext context) async{
+    String email = emailController.text;
+    String password = passwordController.text;
 
+    User? user = await _auth.signUpWithEmailAndPassword(context, email, password);
+    print(user);
+    if (user != null) {
 
+      print('success');
+      Navigator.push(
+          context, MaterialPageRoute(builder: (_) => SignupDetail(email: email)));
+    } else{
+      print('failed');
+    }
   }
 
   @override
@@ -73,7 +90,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   height: 25,
                 ),
                 TextFormField(
-
+                  controller: emailController,
                   style: const TextStyle(
                       color: Colors.black, fontWeight: FontWeight.bold),
                   decoration: const InputDecoration(
@@ -165,7 +182,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
 
                 ElevatedButton(
-                  onPressed: signup,
+                  onPressed: (){
+                    authenticateSignup(context);
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF0C2D57),
                     shape: RoundedRectangleBorder(

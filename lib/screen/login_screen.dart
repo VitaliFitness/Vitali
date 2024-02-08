@@ -1,7 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:vitali/screen/signup_screen.dart';
 import 'package:vitali/screen/welcome_screen.dart';
+
+import '../firebase_auth_services.dart';
 
 
 class LoginScreen extends StatefulWidget {
@@ -21,7 +24,23 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> login() async{
     if(formKey.currentState?.validate() ?? false){
-      
+      String email = usernameController.text;
+      String password = passwordController.text;
+
+        //Authenticate user entered email and password
+        final FirebaseAuthService _auth = FirebaseAuthService();
+        User? userFromFirebase = await _auth.signInWithEmailAndPassword(email, password);
+
+        //If user authentication is valid, get the user details
+        if (userFromFirebase != null) {
+          print("User is successfully signedIn");
+
+
+
+        } else {
+          print("Some error happend");
+        }
+
     }
   }
 
@@ -81,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                  width: 360,
                  height: 90,
                  child : TextFormField(
-
+                   controller: usernameController,
                   style: const TextStyle(
                       color: Colors.black, fontWeight: FontWeight.bold),
                   decoration: const InputDecoration(
