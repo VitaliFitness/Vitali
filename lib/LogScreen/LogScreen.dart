@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -16,17 +17,30 @@ class _LogScreenState extends State<LogScreen> {
 
   DateTime logDate = DateTime.now();
 
-  String selectedFood = 'End';
+  List<String> breakfastItems = [];
+  List<String> lunchItems = [];
+  List<String> dinnerItems = [];
+  List<String> exercises = [];
+
+  double totalCalories = 0;
+  double totalProtein = 0;
+  double totalCarbs = 0;
+  double totalFat = 0;
 
   AddSchedule() async {
 
-    final DatabaseReference _dbReference = FirebaseDatabase.instance.ref().child('Train Schedule');
-    DatabaseReference scheduleRef = _dbReference.child('01');
+    final firestore = FirebaseFirestore.instance.collection('Users');
 
-    //Add the values in the TextFormField into the 'Train Schedule' database
-    scheduleRef.set({
-      'Start Station': 'Colombo',
-      'End Station': 'Kandy',
+    firestore.doc('email').set({
+      'Date' : logDate,
+      'Breakfast log' : breakfastItems,
+      'Lunch log': lunchItems,
+      'Dinner log': dinnerItems,
+      'Exercise log': exercises,
+      'Calories': totalCalories,
+      'Protein': totalProtein,
+      'Carbs': totalCarbs,
+      'Fat': totalFat,
     }).then((value){
       print('Successfully Added');
       Navigator.pop(context);
@@ -79,88 +93,84 @@ class _LogScreenState extends State<LogScreen> {
             children: [
               SizedBox(height: 20),
               showPercentIndicator(
-                  percentage: 20, indicatorName: "Pending"),
-              SizedBox(height: 20),
-              Text(
-                'Breakfast',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20.0,
-                ),
+                  caloriesPercentage: _calculatePercentage(totalCalories, 1500),
+                  proteinPercentage: _calculatePercentage(totalProtein, 100),
+                  carbsPercentage: _calculatePercentage(totalCarbs, 200),
+                  fatPercentage: _calculatePercentage(totalFat, 50),
+                  currentCalories: totalCalories,
+                  currentProtein: totalProtein,
+                  currentCarbs: totalCarbs,
+                  currentFat: totalFat,
               ),
-              Divider(),
-              LogBottomSheet(
-                bottomsheetTitle: 'Food',
-                mealTime: "Breakfast",
-                selectedItem: selectedFood,
-                onSelect: (station) {
-                  setState(() {
-                    selectedFood = station;
-                  });
-                },
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Lunch',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20.0,
-                ),
-              ),
-              Divider(),
-              LogBottomSheet(
-                bottomsheetTitle: 'Food',
-                mealTime: "Lunch",
-                selectedItem: selectedFood,
-                onSelect: (station) {
-                  setState(() {
-                    selectedFood = station;
-                  });
-                },
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Dinner',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20.0,
-                ),
-              ),
-              Divider(),
-              LogBottomSheet(
-                bottomsheetTitle: 'Food',
-                mealTime: "Dinner",
-                selectedItem: selectedFood,
-                onSelect: (station) {
-                  setState(() {
-                    selectedFood = station;
-                  });
-                },
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Exercise',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20.0,
-                ),
-              ),
-              Divider(),
-              LogBottomSheet(
-                bottomsheetTitle: 'Exercise',
-                mealTime: "Dinner",
-                selectedItem: selectedFood,
-                onSelect: (station) {
-                  setState(() {
-                    selectedFood = station;
-                  });
-                },
-              ),
-              SizedBox(height: 20),
+              SizedBox(height: 30),
+              buildItemSection('Breakfast', breakfastItems, (selectedItem, percentages) {
+                setState(() {
+                  breakfastItems.add(selectedItem);
+                  _updateTotals(percentages);
+                });
+              }),
+              buildItemSection('Lunch', lunchItems, (selectedItem, percentages) {
+                setState(() {
+                  lunchItems.add(selectedItem);
+                  _updateTotals(percentages);
+                });
+              }),
+              buildItemSection('Dinner', dinnerItems, (selectedItem, percentages) {
+                setState(() {
+                  dinnerItems.add(selectedItem);
+                  _updateTotals(percentages);
+                });
+              }),
+              buildItemSection('Exercise', exercises, (selectedItem, percentages) {
+                setState(() {
+                  exercises.add(selectedItem);
+                  _updateTotals(percentages);
+                });
+              }),
             ]
           )
         ),
       )
+    );
+  }
+
+  Widget buildItemSection(String title, List<String> items, Function(String, Map<String, dynamic>) onSelect) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20.0,
+          ),
+        ),
+        Divider(),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: items.length,
+          itemBuilder: (BuildContext context, int index) {
+            return ListTile(
+              title: Text(items[index]),
+            );
+          },
+        ),
+        SizedBox(height:10),
+        LogBottomSheet(
+          bottomsheetTitle: title == 'Exercise' ? 'Exercise' : 'Food',
+          mealTime: title,
+          onSelect: (item, calories, protein, carb, fat){
+            onSelect(item, {
+              'calories': calories,
+              'protein': protein ?? 0,
+              'carbs': carb ?? 0,
+              'fat': fat ?? 0,
+            });
+          },
+        ),
+        SizedBox(height: 20),
+      ],
     );
   }
 
@@ -176,6 +186,25 @@ class _LogScreenState extends State<LogScreen> {
       setState(() {
         logDate = picked;
       });
+    }
+  }
+
+  void _updateTotals(Map<String, dynamic> percentages) {
+    setState(() {
+      totalCalories += percentages['calories'] ?? 0.0;
+      totalProtein += percentages['protein'] ?? 0.0;
+      totalCarbs += percentages['carbs'] ?? 0.0;
+      totalFat += percentages['fat'] ?? 0.0;
+    });
+  }
+
+  double _calculatePercentage(double value, double target) {
+    if (value <= 0) {
+      return 0.0;
+    } else if (value >= target) {
+      return 1.0;
+    } else {
+      return value / target;
     }
   }
 }

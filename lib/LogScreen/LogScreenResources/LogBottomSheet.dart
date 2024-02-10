@@ -5,10 +5,9 @@ import 'package:vitali/LogScreen/LogScreenResources/DataBottomSheet.dart';
 class LogBottomSheet extends StatefulWidget {
   String bottomsheetTitle;
   String mealTime;
-  String selectedItem;
-  final Function(String) onSelect;
+  final Function(String, int, double?, double?, double?) onSelect;
 
-  LogBottomSheet({required this.bottomsheetTitle, required this.mealTime, required this.selectedItem, required this.onSelect});
+  LogBottomSheet({required this.bottomsheetTitle, required this.mealTime, required this.onSelect});
 
   @override
   _LogBottomSheet createState() => _LogBottomSheet();
@@ -112,7 +111,7 @@ class _LogBottomSheet extends State<LogBottomSheet> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child:Text(
-                          'Search Food',
+                          'Search',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -136,7 +135,7 @@ class _LogBottomSheet extends State<LogBottomSheet> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child:Text(
-                          'Select Food',
+                          'Select',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -179,9 +178,7 @@ class _LogBottomSheet extends State<LogBottomSheet> {
                                 ),
                                 onTap: () {
                                   setState(() {
-                                    //widget.onSelect(item);
                                     showFilteredResults = false;
-                                    Navigator.pop(context);
                                     if (widget.bottomsheetTitle == 'Food') {
                                       showDataBottomSheetForFood(
                                         context,
@@ -193,21 +190,21 @@ class _LogBottomSheet extends State<LogBottomSheet> {
                                         protein: protein,
                                         carbs: carbs,
                                         fat: fat,
-                                        onSelect: (station) {
+                                        onSelect: (item, calories, protein, carb, fat) {
                                           setState(() {
-                                            selectedFood = station;
+                                            widget.onSelect(item, calories, protein, carbs, fat);
                                           });
                                         },
                                       );
                                     } else{
-                                      print(calories);
+                                      showFilteredResults = false;
                                       showDataBottomSheetForExercise(
                                         context,
                                         bottomsheetTitle: name,
                                         calories: calories,
-                                        onSelect: (station) {
+                                        onSelect: (item, calories) {
                                           setState(() {
-                                            selectedFood = station;
+                                            widget.onSelect(item, calories, 0, 0, 0);
                                           });
                                         },
                                       );

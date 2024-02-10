@@ -6,11 +6,11 @@ void showDataBottomSheetForFood(BuildContext context, {
   required String bottomsheetSubtitle,
   required String mealTime,
   required String count,
-  required Function(String) onSelect,
   required int calories,
   required double protein,
   required double carbs,
-  required double fat
+  required double fat,
+  required Function(String, int, double, double, double) onSelect
 }) {
     showModalBottomSheet(
       context: context,
@@ -155,7 +155,8 @@ void showDataBottomSheetForFood(BuildContext context, {
                     SizedBox(height: 20),
                     TextButton(
                       onPressed: () async {
-
+                        await onSelect(bottomsheetTitle, calories, protein, carbs, fat);
+                        Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF284494),
@@ -190,15 +191,19 @@ void showDataBottomSheetForFood(BuildContext context, {
 void showDataBottomSheetForExercise(BuildContext context, {
   required String bottomsheetTitle,
   required int calories,
-  required Function(String) onSelect,
+  required Function(String, int) onSelect,
 }) {
+  String lastDropdownValue = 'Min';
+
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     builder: (BuildContext context) {
-      String dropdownValue = 'Min';
-      TextEditingController sessionTime = TextEditingController(text: '30');
+      String dropdownValue = lastDropdownValue;
+      TextEditingController sessionTime = TextEditingController(text: lastDropdownValue == 'Hrs' ? '1' : '30');
 
+      int initialCalories = calories;
+      int initialSessionTime = 30;
 
       return StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
@@ -244,10 +249,30 @@ void showDataBottomSheetForExercise(BuildContext context, {
                           child: TextFormField(
                             controller: sessionTime,
                             onChanged: (value) {
+                              int session = int.tryParse(value) ?? 0;
+                              double caloriesPerMinute;
+
+                              if (session == 0) {
+                                setState(() {
+                                  calories = 0;
+                                });
+                                return;
+                              }
+
+                              if (lastDropdownValue == 'Min') {
+                                caloriesPerMinute = initialCalories / initialSessionTime;
+                              } else {
+                                print('inside hrs');
+                                session *= 60;
+                                caloriesPerMinute = initialCalories / initialSessionTime;
+                              }
+
+                              int updatedCalories = (caloriesPerMinute * session).toInt();
+
                               setState((){
-                                print(sessionTime);
-                                }
-                              );
+                                calories = updatedCalories;
+                                print(calories);
+                              });
                             },
                             keyboardType: TextInputType.number,
                             textAlign: TextAlign.center,
@@ -275,10 +300,14 @@ void showDataBottomSheetForExercise(BuildContext context, {
                             onChanged: (String? newValue) {
                               setState(() {
                                 dropdownValue = newValue!;
-                                if (dropdownValue == 'Hrs') {
+                                lastDropdownValue = dropdownValue;
+
+                                if (lastDropdownValue == 'Hrs') {
                                   sessionTime.text = '1';
+                                  calories = ((initialCalories / 30) * 60).toInt();
                                 } else {
                                   sessionTime.text = '30';
+                                  calories = initialCalories;
                                 }
                               });
                             },
@@ -324,7 +353,8 @@ void showDataBottomSheetForExercise(BuildContext context, {
                   SizedBox(height: 20),
                   TextButton(
                     onPressed: () async {
-
+                      await onSelect(bottomsheetTitle, calories);
+                      Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF284494),
