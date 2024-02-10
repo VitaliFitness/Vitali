@@ -1,25 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math.dart' as math;
-import 'package:vitali/Screens/user_profile_screen.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Fitness Progress',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const FitnessProgressScreen(),
-    );
-  }
-}
+import 'user_profile_screen.dart';
 
 class FitnessProgressScreen extends StatefulWidget {
   final double goalCompleted = 0.7;
@@ -27,7 +8,8 @@ class FitnessProgressScreen extends StatefulWidget {
   const FitnessProgressScreen({Key? key}) : super(key: key);
 
   @override
-  _FitnessProgressScreenState createState() => _FitnessProgressScreenState();
+  _FitnessProgressScreenState createState() =>
+      _FitnessProgressScreenState(goalCompleted: goalCompleted);
 }
 
 class _FitnessProgressScreenState extends State<FitnessProgressScreen>
@@ -40,6 +22,10 @@ class _FitnessProgressScreenState extends State<FitnessProgressScreen>
   double progressDegrees = 0;
   var count = 0;
 
+  final double goalCompleted;
+
+  _FitnessProgressScreenState({required this.goalCompleted});
+
   @override
   void initState() {
     super.initState();
@@ -49,7 +35,7 @@ class _FitnessProgressScreenState extends State<FitnessProgressScreen>
         parent: _radialProgressAnimationController, curve: Curves.easeIn))
       ..addListener(() {
         setState(() {
-          progressDegrees = widget.goalCompleted * _progressAnimation.value;
+          progressDegrees = goalCompleted * _progressAnimation.value;
         });
       });
 
@@ -82,6 +68,7 @@ class _FitnessProgressScreenState extends State<FitnessProgressScreen>
       body: Container(
         padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 25),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: Center(
@@ -142,202 +129,257 @@ class _FitnessProgressScreenState extends State<FitnessProgressScreen>
               ),
             ),
             const SizedBox(
-              height: 25,
-            ),
-            Container(
-              padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(
-                    color: const Color(0xFF93A1C9),
-                  ),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-              child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Card(
-                      elevation: 0,
-                      color: Colors.white,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            
-                            SizedBox(width: 8),
-                            Text(
-                              "Goal:",
-                              style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
-                            ),
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              "Gaining Weight",
-                              style: TextStyle(
-                              color: Color(0xFF01AAEC),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                            ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-            ),
-            
-            const SizedBox(
               height: 15,
             ),
-            Row(
-                children: [
-                  Expanded(
-                    child: Container(
-              padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(
-                    color: const Color(0xFF93A1C9),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Goal',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
-                  borderRadius: BorderRadius.circular(15),
                 ),
-              child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Card(
-                      elevation: 0,
-                      color: Colors.white,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                        
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                            Icons.monitor_weight_rounded,
-                            color: Color(0xFF01AAEC),
-                          ),
-                            SizedBox(width: 8, height: 8,),
-                            Text(
-                            "49Kg",
-                            style: TextStyle(
-                              color: Color(0xFF01AAEC),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
+                const Text(
+                  'You are doing great! See your Progress.',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 20,
+                    horizontal: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                      color: const Color(0xFF93A1C9),
+                    ),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Stack(
+                        children: [
+                          SizedBox(
+                            height: 25,
+                            width: double.infinity,
+                            child: LinearProgressIndicator(
+                              value: goalCompleted,
+                              borderRadius: BorderRadius.circular(15),
+                              backgroundColor: const Color(0xFFEAEDF5),
+                              valueColor: const AlwaysStoppedAnimation<Color>(
+                                Color(0xFF01AAEC), // Progress color
+                              ),
                             ),
                           ),
-                            SizedBox(width: 8),
-                            Text(
-                            "Current Weight",
+                          Positioned.fill(
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Center(
+                                  child: Text(
+                                    '${(goalCompleted * 100).toStringAsFixed(0)}%',
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                          height:
+                              8), // Add space between the indicator and the flag icon
+                      const Row(
+                        children: [
+                          Text(
+                            'Start',
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 14,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
+                          Spacer(), // Spacer widget to occupy available space
+                          Icon(
+                            Icons.flag,
+                            color: Colors.black,
+                            size: 20,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(
+                            color: const Color(0xFF93A1C9),
+                          ),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Card(
+                              elevation: 0,
+                              color: Colors.white,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 20, horizontal: 20),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.monitor_weight_rounded,
+                                      color: Color(0xFF01AAEC),
+                                    ),
+                                    SizedBox(
+                                      width: 8,
+                                      height: 8,
+                                    ),
+                                    Text(
+                                      "49Kg",
+                                      style: TextStyle(
+                                        color: Color(0xFF01AAEC),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      "Weight at Start",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 15,
+                    ),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(
+                            color: const Color(0xFF93A1C9),
+                          ),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Card(
+                              elevation: 0,
+                              color: Colors.white,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 20, horizontal: 20),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.monitor_weight_rounded,
+                                      color: Color(0xFF01AAEC),
+                                    ),
+                                    SizedBox(
+                                      width: 8,
+                                      height: 8,
+                                    ),
+                                    Text(
+                                      "53Kg",
+                                      style: TextStyle(
+                                        color: Color(0xFF01AAEC),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      "Target Weight",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ),
                   ],
                 ),
-            ),
-                  ),
-                  const SizedBox(
-                    width: 15,
-                  ),
-                  Expanded(
-                    child: Container(
-              padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(
-                    color: const Color(0xFF93A1C9),
-                  ),
-                  borderRadius: BorderRadius.circular(15),
+                const SizedBox(
+                  height: 35,
                 ),
-              child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Card(
-                      elevation: 0,
-                      color: Colors.white,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                        
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                            Icons.monitor_weight_rounded,
-                            color: Color(0xFF01AAEC),
-                          ),
-                            SizedBox(width: 8, height: 8,),
-                            Text(
-                            "53Kg",
-                            style: TextStyle(
-                              color: Color(0xFF01AAEC),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                            SizedBox(width: 8),
-                            Text(
-                            "Target Weight",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                            ),
-                          ),
-                          ],
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ProfileView(
+                                userEmail: '',
+                              )),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0C2D57),
+                    elevation: 3,
+                    padding: const EdgeInsets.all(15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "View Profile",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-            ),
+                    ],
                   ),
-                  
-                ],
-              ),
-              
-            const SizedBox(
-              height: 35,
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ProfileView()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF0C2D57),
-                elevation: 3,
-                padding: const EdgeInsets.all(15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
                 ),
-              ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "View Profile",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
+              ],
             ),
           ],
         ),
