@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:vitali/Screens/fitness_progress_screen.dart';
 import 'package:vitali/Screens/home_screen.dart';
+import 'package:vitali/screens_recipes/healthyrecipehome_screen.dart';
 
 
 class MainTabView extends StatefulWidget {
-  const MainTabView({required Key key}) : super(key: key);
-
+  const MainTabView({required Key key, required String userEmail}) : super(key:key);
   @override
   State<MainTabView> createState() => _MainTabViewState();
 }
@@ -63,6 +63,7 @@ class _MainTabViewState extends State<MainTabView> {
                     setState(() {
                       selectTab = 2;
                       // Add navigation to camera screen
+                      currentTab = const RecipeScreen();
                     });
                   },
                 ),
@@ -74,7 +75,7 @@ class _MainTabViewState extends State<MainTabView> {
                   onPressed: () {
                     setState(() {
                       selectTab = 3;
-                      currentTab = const FitnessProgressScreen();
+                      currentTab = FitnessProgress(userEmail: '',);
                     });
                   },
                 ),

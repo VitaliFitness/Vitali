@@ -6,6 +6,7 @@ import 'package:vitali/screen/signup_screen.dart';
 import 'package:vitali/screen/welcome_screen.dart';
 
 import '../firebase_auth_services.dart';
+import '../main_tab.dart';
 
 
 class LoginScreen extends StatefulWidget {
@@ -38,6 +39,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
           final prefs = await SharedPreferences.getInstance();
           prefs.setString('Email', email);
+
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+              builder: (context) => MainTabView(key: UniqueKey(), userEmail: '')
+          ),
+          );
 
         } else {
           print("Some error happend");
@@ -181,7 +189,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     minimumSize: const Size(330, 57
                     ),
-
                   ),
 
                   child: const Text(
