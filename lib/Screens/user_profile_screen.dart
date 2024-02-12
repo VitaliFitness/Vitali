@@ -1,13 +1,46 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileView extends StatefulWidget {
-  const ProfileView({Key? key}) : super(key: key);
+  final String userEmail;
+
+  ProfileView({Key? key, required this.userEmail}) : super(key: key);
 
   @override
   State<ProfileView> createState() => _ProfileViewState();
 }
 
 class _ProfileViewState extends State<ProfileView> {
+  Map<String, dynamic> userData = {};
+  late SharedPreferences prefs;
+  late String email;
+
+  @override
+  void initState() {
+    super.initState();
+    initializePreferences();
+  }
+
+  Future<void> initializePreferences() async {
+    prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('Email') ?? '';
+    fetchData(email);
+  }
+
+  Future<void> fetchData(String email) async {
+    final userSnapshot =
+        await FirebaseFirestore.instance.collection('Users').doc(email).get();
+
+    if (userSnapshot.exists) {
+      setState(() {
+        userData = userSnapshot.data() ?? {};
+      });
+    } else {
+      print('User data not found for email: $email');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,12 +71,13 @@ class _ProfileViewState extends State<ProfileView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Profile picture and edit button
               Row(
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(30),
                     child: Image.asset(
-                      "assets/img/Firefly fitness app logo 73872.jpg",
+                      "images/Firefly fitness app logo 73872.jpg",
                       width: 50,
                       height: 50,
                       fit: BoxFit.cover,
@@ -52,13 +86,13 @@ class _ProfileViewState extends State<ProfileView> {
                   const SizedBox(
                     width: 15,
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Oshani Sandunika",
-                          style: TextStyle(
+                          "${userData['First Name']} ${userData['Last Name']}",
+                          style: const TextStyle(
                             color: Colors.black,
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -75,9 +109,8 @@ class _ProfileViewState extends State<ProfileView> {
                         elevation: 3,
                         backgroundColor: const Color(0xFF0C2D57),
                         shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(10), // Adjust the radius as needed
-                  ),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                       onPressed: () {
                         // Do something on button press
@@ -97,241 +130,112 @@ class _ProfileViewState extends State<ProfileView> {
               const SizedBox(
                 height: 15,
               ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(
-                          color: const Color(0xFF93A1C9),
-                        ),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      padding: const EdgeInsets.all(10),
-                      child: const Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "160cm",
-                            style: TextStyle(
-                              color: Color(0xFF01AAEC),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          Text(
-                            "Height",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 15,
-                  ),
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(
-                          color: const Color(0xFF93A1C9),
-                        ),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      padding: const EdgeInsets.all(10),
-                      child: const Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "53Kg",
-                            style: TextStyle(
-                              color: Color(0xFF01AAEC),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          Text(
-                            "Weight",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 15,
-                  ),
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(
-                          color: const Color(0xFF93A1C9),
-                        ),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      padding: const EdgeInsets.all(10),
-                      child: const Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "22 Years",
-                            style: TextStyle(
-                              color: Color(0xFF01AAEC),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          Text(
-                            "Age",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(
-                    color: const Color(0xFF93A1C9),
-                  ),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              // Display user details
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      "Personal Details",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 8,
-                    ),
-                    // Gender
-                    Card(
-                      elevation: 2,
-                      color: Color(0xFFEAEDF5),
-                      child: Padding(
-                        padding: EdgeInsets.all(15),
-                        child: Row(
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(
+                            color: const Color(0xFF93A1C9),
+                          ),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        padding: const EdgeInsets.all(5),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons
-                                  .person, // Replace with your gender-related icon
-                              color: Color(0xFF01AAEC),
-                            ),
-                            SizedBox(width: 8),
                             Text(
-                              "Gender:",
-                              style: TextStyle(
-                                color: Colors.black,
+                              '${userData['Height']}',
+                              style: const TextStyle(
+                                color: Color(0xFF01AAEC),
                                 fontSize: 14,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
-                            SizedBox(width: 8),
-                            Text(
-                              "Female",
+                            const SizedBox(height: 4),
+                            const Text(
+                              "Height",
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 14,
-                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    // Fitness Goal
-                    Card(
-                      elevation: 2,
-                      color: Color(0xFFEAEDF5),
-                      child: Padding(
-                        padding: EdgeInsets.all(15),
-                        child: Row(
+                    SizedBox(width: 8), // Add spacing between containers
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(
+                            color: const Color(0xFF93A1C9),
+                          ),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons
-                                  .fitness_center, // Replace with your fitness-related icon
-                              color: Color(0xFF01AAEC),
-                            ),
-                            SizedBox(width: 8),
                             Text(
-                              "Fitness Goal:",
-                              style: TextStyle(
-                                color: Colors.black,
+                              '${userData['Weight']}',
+                              style: const TextStyle(
+                                color: Color(0xFF01AAEC),
                                 fontSize: 14,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
-                            SizedBox(width: 8),
-                            Text(
-                              "Gain weight",
+                            const SizedBox(height: 4),
+                            const Text(
+                              "Weight",
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 14,
-                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    // Email
-                    Card(
-                      elevation: 2,
-                      color: Color(0xFFEAEDF5),
-                      child: Padding(
-                        padding: EdgeInsets.all(15),
-                        child: Row(
+                    const SizedBox(width: 8), // Add spacing between containers
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(
+                            color: const Color(0xFF93A1C9),
+                          ),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        padding: const EdgeInsets.all(5),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons
-                                  .mail, // Replace with your email-related icon
-                              color: Color(0xFF01AAEC),
-                            ),
-                            SizedBox(width: 8),
                             Text(
-                              "Contact:",
-                              style: TextStyle(
-                                color: Colors.black,
+                              '${userData['Date of Birth']}',
+                              style: const TextStyle(
+                                color: Color(0xFF01AAEC),
                                 fontSize: 14,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
-                            SizedBox(width: 8),
-                            Text(
-                              "oshanisandunika@gmail.com",
+                            const SizedBox(height: 4),
+                            const Text(
+                              "DOB",
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 14,
-                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
@@ -341,9 +245,11 @@ class _ProfileViewState extends State<ProfileView> {
                   ],
                 ),
               ),
+
               const SizedBox(
-                height: 20,
+                height: 25,
               ),
+              // Personal details cards
               Container(
                 padding:
                     const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
@@ -354,10 +260,48 @@ class _ProfileViewState extends State<ProfileView> {
                   ),
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
+                      "Personal Details",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    _buildPersonalDetailCard(
+                      icon: Icons.person,
+                      title: "Gender:",
+                      detail: "${userData['Gender']}",
+                    ),
+                    _buildPersonalDetailCard(
+                      icon: Icons.mail,
+                      title: "Contact:",
+                      detail: "${userData['Email Address']}",
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 25,
+              ),
+              // Other options cards
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(
+                    color: const Color(0xFF93A1C9),
+                  ),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
                       "Other",
                       style: TextStyle(
                         color: Colors.black,
@@ -365,74 +309,20 @@ class _ProfileViewState extends State<ProfileView> {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    SizedBox(
-                      height: 8,
+                    // Contact us card
+                    _buildOtherOptionsCard(
+                      icon: Icons.phone,
+                      title: "Contact Us",
                     ),
-                    Card(
-                      elevation: 2,
-                      color: Color(0xFFEAEDF5),
-                      child: ListTile(
-                        leading: Icon(
-                          Icons.phone,
-                          color: Color(0xFF01AAEC),
-                        ),
-                        title: Text(
-                          "Contact Us",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        trailing: Icon(
-                          Icons.navigate_next,
-                          color: Color(0xFF01AAEC),
-                        ),
-                      ),
+                    // Privacy policy card
+                    _buildOtherOptionsCard(
+                      icon: Icons.policy,
+                      title: "Privacy Policy",
                     ),
-                    Card(
-                      elevation: 2,
-                      color: Color(0xFFEAEDF5),
-                      child: ListTile(
-                        leading: Icon(
-                          Icons.policy,
-                          color: Color(0xFF01AAEC),
-                        ),
-                        title: Text(
-                          "Privacy Policy",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        trailing: Icon(
-                          Icons.navigate_next,
-                          color: Color(0xFF01AAEC),
-                        ),
-                      ),
-                    ),
-                    Card(
-                      elevation: 2,
-                      color: Color(0xFFEAEDF5),
-                      child: ListTile(
-                        leading: Icon(
-                          Icons.settings,
-                          color: Color(0xFF01AAEC),
-                        ),
-                        title: Text(
-                          "Settings",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        trailing: Icon(
-                          Icons.navigate_next,
-                          color: Color(0xFF01AAEC),
-                        ),
-                      ),
+                    // Settings card
+                    _buildOtherOptionsCard(
+                      icon: Icons.settings,
+                      title: "Settings",
                     ),
                   ],
                 ),
@@ -447,26 +337,83 @@ class _ProfileViewState extends State<ProfileView> {
                   elevation: 3,
                   padding: const EdgeInsets.all(15),
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(15), // Adjust the radius as needed
+                    borderRadius: BorderRadius.circular(15),
                   ),
                 ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Logout",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
+                child: const Text(
+                  "Logout",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPersonalDetailCard(
+      {required IconData icon, required String title, required String detail}) {
+    return Card(
+      elevation: 2,
+      color: const Color(0xFFEAEDF5),
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: const Color(0xFF01AAEC),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              detail,
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOtherOptionsCard(
+      {required IconData icon, required String title}) {
+    return Card(
+      elevation: 2,
+      color: const Color(0xFFEAEDF5),
+      child: ListTile(
+        leading: Icon(
+          icon,
+          color: const Color(0xFF01AAEC),
+        ),
+        title: Text(
+          title,
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        trailing: const Icon(
+          Icons.navigate_next,
+          color: Color(0xFF01AAEC),
         ),
       ),
     );
