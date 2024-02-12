@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:vitali/screen/latestreceipe_screen.dart';
-import 'package:vitali/screen/search_screen.dart';
-import 'package:vitali/screen/trendingreceipe_screen.dart';
+import 'package:vitali/screens_recipes/search_screen.dart';
+import 'package:vitali/screens_recipes/trendingreceipe_screen.dart';
+import 'latestreceipe_screen.dart';
 
 
 class RecipeScreen extends StatefulWidget {
@@ -273,7 +273,7 @@ class RecipeCarouselItem extends StatelessWidget {
 class RecipeDetailScreen extends StatelessWidget {
   final Map<dynamic, dynamic> recipe;
 
-  const RecipeDetailScreen({Key? key, required this.recipe}) : super(key: key);
+  const RecipeDetailScreen({super.key, required this.recipe});
 
   @override
   Widget build(BuildContext context) {
@@ -303,15 +303,15 @@ class RecipeDetailScreen extends StatelessWidget {
                   _buildSectionTitle('Description'),
                   const SizedBox(height: 10),
                   _buildDescription(recipe['Description']),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
                   _buildSectionTitle('Ingredients'),
                   const SizedBox(height: 10),
                   _buildIngredientsList(recipe['Ingredients']),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   _buildSectionTitle('Instructions'),
                   const SizedBox(height: 10),
                   _buildInstructionsList(recipe['Instructions']),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
@@ -324,7 +324,7 @@ class RecipeDetailScreen extends StatelessWidget {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: TextStyle(
+      style: const TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 20,
       ),
@@ -334,7 +334,7 @@ class RecipeDetailScreen extends StatelessWidget {
   Widget _buildDescription(String? description) {
     return Text(
       description ?? 'No description available',
-      style: TextStyle(
+      style: const TextStyle(
         fontSize: 16,
       ),
     );
@@ -360,27 +360,27 @@ class RecipeDetailScreen extends StatelessWidget {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.check_circle,
                         color: Colors.green,
                         size: 16, // Reduced icon size
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               entry.key.toString(),
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15, // Reduced font size
                               ),
                             ),
-                            SizedBox(height: 2),
+                            const SizedBox(height: 2),
                             Text(
                               entry.value.toString(),
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 13, // Reduced font size
                               ),
                             ),
@@ -396,7 +396,7 @@ class RecipeDetailScreen extends StatelessWidget {
         }).toList(),
       );
     } else {
-      return Text(
+      return const Text(
         'No ingredients available',
         style: TextStyle(
           fontStyle: FontStyle.italic,
@@ -412,14 +412,14 @@ class RecipeDetailScreen extends StatelessWidget {
         children: instructions.where((item) => item != null).map<Widget>((item) {
           return Text(
             item.toString(),
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
             ),
           );
         }).toList(),
       );
     } else {
-      return Text(
+      return const Text(
         'No instructions available',
         style: TextStyle(
           fontStyle: FontStyle.italic,

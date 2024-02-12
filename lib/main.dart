@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:vitali/screen/healthyrecipehome_screen.dart';
+import 'package:vitali/screens_recipes/healthyrecipehome_screen.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {

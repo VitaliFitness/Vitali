@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'healthyrecipehome_screen.dart';
 
+
 class TrendingRecipeScreen extends StatefulWidget {
   const TrendingRecipeScreen({super.key});
 
