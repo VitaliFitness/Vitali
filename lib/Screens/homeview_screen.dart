@@ -14,7 +14,7 @@ class _HomeViewState extends State<HomeView> {
         body: Center(
         child: Text(
         'Home Screen!',
-        style: TextStyle(fontSize: 24.0),
+        style: TextStyle(fontSize: 15.0),
          ),
         ),
     );
