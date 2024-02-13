@@ -1,25 +1,68 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-void showDataBottomSheetForFood(BuildContext context, {
+import 'fetchBottomSheetItems.dart';
+import 'getItemIcon.dart';
+
+Future<void> showDataBottomSheetForFood(BuildContext context, {
   required String bottomsheetTitle,
-  required String bottomsheetSubtitle,
   required String mealTime,
-  required String count,
-  required int calories,
-  required double protein,
-  required double carbs,
-  required double fat,
-  required Function(String, int, double, double, double) onSelect
-}) {
+  int? updateQuantity,
+  DateTime? updateDate,
+  int? updateCalories,
+  double? updateProtein,
+  double? updateCarbs,
+  double? updateFat,
+  required Function(String, String, int, int, double, double, double) onSelect,
+  required Function() updateData,
+  Function(String, String, Map<String, dynamic>)? onDelete,
+  Function(int, double, double, double)? onUpdate,
+}) async {
+    List<Map<String, dynamic>> items = [];
+
+    await fetchItems('Food').then((value) {
+      items = value;
+      print('===========$items');
+    });
+
+    Map<String, dynamic>? itemData = await getItemData(items, bottomsheetTitle);
+    print(itemData);
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (BuildContext context) {
+        String count = '';
+        String type = '';
+        int calories = 0;
+        double protein = 0;
+        double carbs = 0;
+        double fat = 0;
+
+        if (itemData != null) {
+          count = itemData['count'];
+          type = itemData['type'];
+          calories = itemData['calories'];
+          protein = itemData['protein'];
+          carbs = itemData['carbs'];
+          fat = itemData['fat'];
+        } else {
+          print('Item not found.');
+        }
+
         int initialCalories = calories;
         double initialProtein = protein;
         double initialCarbs = carbs;
         double initialFat = fat;
+
+        if (updateCalories != null){
+          calories = updateCalories ?? calories;
+          protein = updateProtein ?? protein;
+          carbs = updateCarbs ?? carbs;
+          fat = updateFat ?? fat;
+        }
 
         int quantity = 1;
 
@@ -37,15 +80,26 @@ void showDataBottomSheetForFood(BuildContext context, {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text(
-                      bottomsheetTitle,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          getFoodIcon(type ?? '')[0],
+                          size: 30,
+                          color: getFoodIcon(type ?? '')[1],
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          bottomsheetTitle,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                     Text(
-                      bottomsheetSubtitle,
+                      type,
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[400],
@@ -69,8 +123,33 @@ void showDataBottomSheetForFood(BuildContext context, {
                             alignment: Alignment.center,
                             height: 50,
                             color: Colors.grey[200],
-                            child: Text(
-                                calories.toString(), style: TextStyle(color: Colors.black)),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                      calories.toString(), style: TextStyle(color: Colors.black)),
+                                  SizedBox(height: 5),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.flash_on,
+                                        color: Colors.orange,
+                                        size: 14,
+                                      ),
+                                      Text(
+                                        'Calories',
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                         SizedBox(width: 10),
@@ -78,10 +157,34 @@ void showDataBottomSheetForFood(BuildContext context, {
                           child: Container(
                             alignment: Alignment.center,
                             height: 50,
-                            width: 50,
                             color: Colors.grey[200],
-                            child: Text(
-                                protein.toString(), style: TextStyle(color: Colors.black)),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                      protein.toString(), style: TextStyle(color: Colors.black)),
+                                  SizedBox(height: 5),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.fitness_center,
+                                        color: Colors.green,
+                                        size: 14,
+                                      ),
+                                      Text(
+                                        'Protein',
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                         SizedBox(width: 10),
@@ -90,8 +193,33 @@ void showDataBottomSheetForFood(BuildContext context, {
                             alignment: Alignment.center,
                             height: 50,
                             color: Colors.grey[200],
-                            child: Text(
-                                carbs.toString(), style: TextStyle(color: Colors.black)),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                      carbs.toString(), style: TextStyle(color: Colors.black)),
+                                  SizedBox(height: 5),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.local_pizza,
+                                        color: Colors.brown,
+                                        size: 14,
+                                      ),
+                                      Text(
+                                        'Carbs',
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                         SizedBox(width: 10),
@@ -100,8 +228,33 @@ void showDataBottomSheetForFood(BuildContext context, {
                             alignment: Alignment.center,
                             height: 50,
                             color: Colors.grey[200],
-                            child: Text(
-                                fat.toString(), style: TextStyle(color: Colors.black)),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                      fat.toString(), style: TextStyle(color: Colors.black)),
+                                  SizedBox(height: 5),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.local_gas_station,
+                                        color: Colors.red,
+                                        size: 14,
+                                      ),
+                                      Text(
+                                        'Fat',
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -114,30 +267,30 @@ void showDataBottomSheetForFood(BuildContext context, {
                         width: 50,
                         decoration: BoxDecoration(
                           color: Colors.grey[200],
-                          border: Border.all(color: Colors.black),
+                          border: Border.all(color: Color(0xFF01AAEC)),
                           borderRadius: BorderRadius.circular(5),
                         ),
                         child: TextFormField(
-                          initialValue: '1',
+                          initialValue: updateQuantity != null ? updateQuantity.toString() : '1',
                           onChanged: (value) {
-                            setState((){
-                              quantity = int.parse(value);
-                              print(quantity);
+                            if (value.isNotEmpty && int.tryParse(value) != null) {
+                              setState(() {
+                                quantity = int.parse(value);
+                                print(quantity);
 
-                              if(quantity != 0) {
-                                int updatedCalories = initialCalories * quantity;
-                                double updatedProtein = initialProtein * quantity;
-                                double updatedCarbs = initialCarbs * quantity;
-                                double updatedFat = initialFat * quantity;
+                                if(quantity != 0) {
+                                  int totalCalories = initialCalories * quantity;
+                                  double totalProtein = initialProtein * quantity;
+                                  double totalCarbs = initialCarbs * quantity;
+                                  double totalFat = initialFat * quantity;
 
-                                calories = updatedCalories;
-                                protein = double.parse(updatedProtein.toStringAsFixed(2));
-                                carbs = double.parse(updatedCarbs.toStringAsFixed(2));
-                                fat = double.parse(updatedFat.toStringAsFixed(2));
-
-                                print(calories);
-                              }
-                            });
+                                  calories = totalCalories;
+                                  protein = double.parse(totalProtein.toStringAsFixed(2));
+                                  carbs = double.parse(totalCarbs.toStringAsFixed(2));
+                                  fat = double.parse(totalFat.toStringAsFixed(2));
+                                }
+                              });
+                            }
                           },
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
@@ -153,27 +306,88 @@ void showDataBottomSheetForFood(BuildContext context, {
                         child: Text(
                             'Quantity', style: TextStyle(color: Colors.black))),
                     SizedBox(height: 20),
-                    TextButton(
-                      onPressed: () async {
-                        await onSelect(bottomsheetTitle, calories, protein, carbs, fat);
-                        Navigator.pop(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF284494),
-                        minimumSize: Size(MediaQuery
-                            .of(context)
-                            .size
-                            .width, 50),
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5.0)),
+                    Visibility(
+                    visible: updateCalories == null,
+                      child: TextButton(
+                        onPressed: () async {
+                          Navigator.pop(context);
+                          await onSelect(bottomsheetTitle, count, quantity, calories, protein, carbs, fat);
+                          await updateData();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF284494),
+                          minimumSize: Size(MediaQuery
+                              .of(context)
+                              .size
+                              .width, 50),
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5.0)),
+                        ),
+                        child:
+                          Text(
+                          "Add to $mealTime",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
-                      child: Text(
-                        "Add to $mealTime",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold),
+                    ),
+                    Visibility(
+                      visible: updateCalories != null,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextButton(
+                              onPressed: () async {
+                                int updatedCalories = calories - (updateCalories ?? 0);
+                                double updatedProtein = protein - (updateProtein ?? 0);
+                                double updatedCarbs = carbs - (updateCarbs ?? 0);
+                                double updatedFat = fat - (updateFat ?? 0);
+                                print(calories);
+                                print(updatedCalories);
+                                print('on dbts : $updatedCalories');
+
+                                Navigator.pop(context);
+                                onUpdate!(updatedCalories, updatedProtein, updatedCarbs, updatedFat);
+                                await onSelect(bottomsheetTitle, count, quantity, calories, protein, carbs, fat);
+                                await updateData();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFF284494),
+                                elevation: 2,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5.0)),
+                              ),
+                              child:
+                              Text(
+                                "Update to $mealTime",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: ()  async {
+                            Navigator.pop(context);
+                            await deleteItem(updateDate!, mealTime, bottomsheetTitle);
+                            await onDelete!(bottomsheetTitle, mealTime, {
+                              'calories': updateCalories,
+                              'protein': updateProtein,
+                              'carbs': updateCarbs,
+                              'fat': updateFat,
+                            });
+                            await updateData();
+                            },
+                            icon: Icon(
+                              Icons.delete,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     SizedBox(height: 20),
@@ -188,22 +402,50 @@ void showDataBottomSheetForFood(BuildContext context, {
 
 }
 
-void showDataBottomSheetForExercise(BuildContext context, {
+Future<void> showDataBottomSheetForExercise(BuildContext context, {
   required String bottomsheetTitle,
-  required int calories,
-  required Function(String, int) onSelect,
-}) {
-  String lastDropdownValue = 'Min';
+  DateTime? updateDate,
+  String? updateLastDropdownValue,
+  int? updateCalories,
+  String? updateSessionTime,
+  required Function() updateData,
+  required Function(String, String, String, int) onSelect,
+  Function(String, String, Map<String, dynamic>)? onDelete,
+  Function(int)? onUpdate,
+}) async {
+  List<Map<String, dynamic>> items = [];
+
+  await fetchItems('Exercise').then((value) {
+    items = value;
+    print('===========$items');
+  });
+
+  Map<String, dynamic>? itemData = await getItemData(items, bottomsheetTitle);
+  print(itemData);
+
+  String lastDropdownValue = updateLastDropdownValue != null ? updateLastDropdownValue : 'Min';
 
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     builder: (BuildContext context) {
       String dropdownValue = lastDropdownValue;
-      TextEditingController sessionTime = TextEditingController(text: lastDropdownValue == 'Hrs' ? '1' : '30');
+      TextEditingController sessionTime = TextEditingController(text: updateSessionTime != null ? updateSessionTime : lastDropdownValue == 'Hrs' ? '1' : '30');
+
+      int calories = 0;
+
+      if (itemData != null) {
+        calories = itemData['calories'];
+      } else {
+        print('Item not found.');
+      }
 
       int initialCalories = calories;
       int initialSessionTime = 30;
+
+      if (updateCalories != null){
+        calories = updateCalories ?? calories;
+      }
 
       return StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
@@ -219,12 +461,23 @@ void showDataBottomSheetForExercise(BuildContext context, {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Text(
-                    bottomsheetTitle,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        getExerciseIcon(bottomsheetTitle)[0],
+                        size: 30,
+                        color: getExerciseIcon(bottomsheetTitle)[1],
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        bottomsheetTitle,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 20),
                   Row(
@@ -243,7 +496,7 @@ void showDataBottomSheetForExercise(BuildContext context, {
                           width: 50,
                           decoration: BoxDecoration(
                             color: Colors.grey[200],
-                            border: Border.all(color: Colors.black),
+                            border: Border.all(color: Color(0xFF01AAEC)),
                             borderRadius: BorderRadius.circular(5),
                           ),
                           child: TextFormField(
@@ -292,7 +545,7 @@ void showDataBottomSheetForExercise(BuildContext context, {
                           width: 50,
                           decoration: BoxDecoration(
                             color: Colors.grey[200],
-                            border: Border.all(color: Colors.black),
+                            border: Border.all(color: Color(0xFF01AAEC)),
                             borderRadius: BorderRadius.circular(5),
                           ),
                           child: DropdownButton<String>(
@@ -351,27 +604,81 @@ void showDataBottomSheetForExercise(BuildContext context, {
                     ],
                   ),
                   SizedBox(height: 20),
-                  TextButton(
-                    onPressed: () async {
-                      await onSelect(bottomsheetTitle, calories);
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF284494),
-                      minimumSize: Size(MediaQuery
-                          .of(context)
-                          .size
-                          .width, 50),
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5.0)),
+                  Visibility(
+                    visible: updateCalories == null,
+                    child: TextButton(
+                      onPressed: () async {
+                        await onSelect(bottomsheetTitle, lastDropdownValue, sessionTime.text, calories);
+                        await updateData();
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF284494),
+                        minimumSize: Size(MediaQuery
+                            .of(context)
+                            .size
+                            .width, 50),
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0)),
+                      ),
+                      child: Text(
+                        "Add to $bottomsheetTitle",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold),
+                      ),
                     ),
-                    child: Text(
-                      "Add",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold),
+                  ),
+                  Visibility(
+                    visible: updateCalories != null,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () async {
+                              int updatedCalories = calories - (updateCalories ?? 0);
+
+                              onUpdate!(updatedCalories);
+                              await onSelect(bottomsheetTitle, lastDropdownValue, sessionTime.text, calories);
+                              await updateData();
+                              Navigator.pop(context);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color(0xFF284494),
+                              minimumSize: Size(MediaQuery
+                                  .of(context)
+                                  .size
+                                  .width, 50),
+                              elevation: 2,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5.0)),
+                            ),
+                            child: Text(
+                              "Update to $bottomsheetTitle",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: ()  async {
+                            Navigator.pop(context);
+                            await deleteItem(updateDate!, 'Exercise', bottomsheetTitle);
+                            await onDelete!(bottomsheetTitle, 'Exercise', {
+                              'calories': updateCalories,
+                            });
+                            await updateData();
+                          },
+                          icon: Icon(
+                            Icons.delete,
+                            color: Color(0xFF284494),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   SizedBox(height: 20),

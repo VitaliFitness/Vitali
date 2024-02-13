@@ -29,6 +29,7 @@ class showPercentIndicator extends StatelessWidget {
       children: [
         Row(
           children: [
+            SizedBox(width: 20),
             CircularPercentIndicator(
               animation: true,
               animationDuration: 1000,
@@ -125,6 +126,7 @@ class showPercentIndicator extends StatelessWidget {
                     backgroundColor: Color.fromRGBO(200, 200, 200, 1.0),
                     linearStrokeCap: LinearStrokeCap.roundAll,
                   ),
+                  SizedBox(width: 20),
                 ],
               ),
             ),

@@ -2,12 +2,16 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:vitali/LogScreen/LogScreenResources/DataBottomSheet.dart';
 
+import 'fetchBottomSheetItems.dart';
+import 'getItemIcon.dart';
+
 class LogBottomSheet extends StatefulWidget {
   String bottomsheetTitle;
   String mealTime;
-  final Function(String, int, double?, double?, double?) onSelect;
+  final Function(String, String, String, int, int, double?, double?, double?) onSelect;
+  Function() updateData;
 
-  LogBottomSheet({required this.bottomsheetTitle, required this.mealTime, required this.onSelect});
+  LogBottomSheet({required this.bottomsheetTitle, required this.mealTime, required this.onSelect, required this.updateData});
 
   @override
   _LogBottomSheet createState() => _LogBottomSheet();
@@ -22,56 +26,16 @@ class _LogBottomSheet extends State<LogBottomSheet> {
 
   String selectedFood = 'End';
 
-  void fetchFoodItems() async {
-    late DataSnapshot snapshot;
-    if (widget.bottomsheetTitle == "Exercise"){
-      snapshot = (await FirebaseDatabase.instance.ref().child('Exercise').get());
-      Map<dynamic, dynamic>? data = snapshot.value as Map<dynamic, dynamic>?;
-      if (data != null) {
-        data.forEach((exerciseKey, exerciseValue) {
-
-          String exerciseName = exerciseKey.toString();
-          int calories = exerciseValue['Calories'];
-
-          items.add({'name': exerciseName, 'calories': calories});
-        });
-      }
-        print(items);
-        filteredItems = List.from(items);
-        setState(() {});
-
-    } else{
-      snapshot = (await FirebaseDatabase.instance.ref().child('Food Items').get());
-      Map<dynamic, dynamic>? data = snapshot.value as Map<dynamic, dynamic>?;
-      if (data != null) {
-        data.forEach((categoryKey, categoryValue) {
-          if (categoryValue is Map<dynamic, dynamic>) {
-            categoryValue.forEach((foodKey, foodValue) {
-              String type = categoryKey.toString();
-              String name = foodKey.toString();
-              int calories = foodValue['Calories'];
-              String count = foodValue['Count'].toString();
-              double protein = (foodValue['Protein'] ?? 0.0).toDouble();
-              double carbs = (foodValue['Carbs'] ?? 0.0).toDouble();
-              double fat = (foodValue['Fat'] ?? 0.0).toDouble();
-              print(carbs);
-
-              items.add({'name': name, 'type': type, 'calories': calories, 'count': count,
-                'protein': protein, 'carbs': carbs, 'fat': fat,});
-            });
-          }
-        });
-        print(items);
-        filteredItems = List.from(items);
-        setState(() {});
-    }
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    fetchFoodItems();
+    fetchItems(widget.bottomsheetTitle).then((value) {
+      setState(() {
+        items = value;
+        filteredItems = List.from(items);
+      });
+    });
   }
 
   void updateFilteredItems(String query) {
@@ -94,7 +58,7 @@ class _LogBottomSheet extends State<LogBottomSheet> {
           isScrollControlled: true,
           builder: (BuildContext context) {
             return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) { //Use StatefulBuilder here
+              builder: (BuildContext context, StateSetter setState) {
                 return Container(
                   padding: EdgeInsets.all(16.0),
                   child: Column(
@@ -103,7 +67,7 @@ class _LogBottomSheet extends State<LogBottomSheet> {
                       Text(
                         widget.bottomsheetTitle,
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -120,10 +84,15 @@ class _LogBottomSheet extends State<LogBottomSheet> {
                       ),
                       TextFormField(
                         decoration: InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                            borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                            borderSide: BorderSide(color: Colors.grey[300]!),
                           ),
-                          border: InputBorder.none,
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                            borderSide: BorderSide(color: Color(0xFF01AAEC)),
+                          ),
                           fillColor: Colors.grey[200],
                           filled: true,
                         ),
@@ -131,7 +100,7 @@ class _LogBottomSheet extends State<LogBottomSheet> {
                           updateFilteredItems(value);
                         },
                       ),
-                      SizedBox(height: 16),
+                      SizedBox(height: 20),
                       Align(
                         alignment: Alignment.centerLeft,
                         child:Text(
@@ -142,6 +111,7 @@ class _LogBottomSheet extends State<LogBottomSheet> {
                           ),
                         ),
                       ),
+                      SizedBox(height: 10),
                       Container(
                         height: MediaQuery.of(context).size.height * 0.5,
                         child: ListView.builder(
@@ -159,6 +129,21 @@ class _LogBottomSheet extends State<LogBottomSheet> {
                               return ListTile(
                                 title: Row(
                                   children: [
+                                    if (widget.bottomsheetTitle == 'Food')
+                                    Icon(
+                                      getFoodIcon(type ?? '')[0],
+                                      size: 16,
+                                      color: getFoodIcon(type ?? '')[1],
+                                    ),
+
+                                    if (widget.bottomsheetTitle == 'Exercise')
+                                      Icon(
+                                        getExerciseIcon(name ?? '')[0],
+                                        size: 16,
+                                        color: getExerciseIcon(name ?? '')[1],
+                                      ),
+
+                                    SizedBox(width: 10),
                                     Expanded(
                                       child: Text(
                                         name,
@@ -183,30 +168,26 @@ class _LogBottomSheet extends State<LogBottomSheet> {
                                       showDataBottomSheetForFood(
                                         context,
                                         bottomsheetTitle: name,
-                                        bottomsheetSubtitle: type,
                                         mealTime: widget.mealTime,
-                                        count: count,
-                                        calories: calories,
-                                        protein: protein,
-                                        carbs: carbs,
-                                        fat: fat,
-                                        onSelect: (item, calories, protein, carb, fat) {
+                                        onSelect: (item, count, quantity, calories, protein, carb,
+                                            fat) {
                                           setState(() {
-                                            widget.onSelect(item, calories, protein, carbs, fat);
+                                            widget.onSelect(item, type, count, quantity, calories, protein, carbs, fat);
                                           });
                                         },
+                                        updateData: widget.updateData,
                                       );
                                     } else{
                                       showFilteredResults = false;
                                       showDataBottomSheetForExercise(
                                         context,
                                         bottomsheetTitle: name,
-                                        calories: calories,
-                                        onSelect: (item, calories) {
+                                        onSelect: (item, count, sessionTime, calories) {
                                           setState(() {
-                                            widget.onSelect(item, calories, 0, 0, 0);
+                                            widget.onSelect(item, type, count, int.parse(sessionTime), calories, 0, 0, 0);
                                           });
                                         },
+                                        updateData: widget.updateData,
                                       );
                                     }
                                   });
