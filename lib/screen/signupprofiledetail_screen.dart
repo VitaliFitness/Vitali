@@ -1,8 +1,7 @@
-import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'fitnessdetail_screen.dart';
+import 'package:vitali/screen/signup_screen.dart';
 import 'login_screen.dart';
 
 
@@ -54,7 +53,7 @@ class _SignupDetailState extends State<SignupDetail> {
     });
 
     Navigator.push(
-        context, MaterialPageRoute(builder: (_) => LoginScreen()));
+        context, MaterialPageRoute(builder: (_) => const LoginScreen()));
   }
 
   @override
@@ -78,17 +77,6 @@ class _SignupDetailState extends State<SignupDetail> {
     }
   }
 
-  Future<void> pickImage() async {
-    final picker = ImagePicker();
-    final pickedfile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedfile != null){
-      setState(() {
-        imagePath = pickedfile.path;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,7 +88,7 @@ class _SignupDetailState extends State<SignupDetail> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const FitnessLevelScreen()),
+              MaterialPageRoute(builder: (context) => const SignUpScreen()),
             );
           },
         ),
@@ -131,16 +119,7 @@ class _SignupDetailState extends State<SignupDetail> {
                   padding: const EdgeInsets.symmetric(horizontal: 15.0),
                   child: Column(
                     children: [
-                      GestureDetector(
-                        onTap: pickImage,
-                        child: CircleAvatar(
-                          radius: 58,
-                          backgroundColor: const Color(0xFFEAF3FF),
-                          backgroundImage:
-                          imagePath.isNotEmpty ? FileImage(File(imagePath)) : null,
-                          child: imagePath.isEmpty ? const Icon(Icons.add_a_photo, size:25,):null,
-                        ),
-                      ),
+
                       const SizedBox(
                         height: 18,
                       ),

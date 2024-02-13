@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../screen/updateprofile_screen.dart';
+
 class ProfileView extends StatefulWidget {
   final String userEmail;
 
@@ -112,9 +114,13 @@ class _ProfileViewState extends State<ProfileView> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      onPressed: () {
-                        // Do something on button press
-                      },
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => UpdateProfileScreen(email: email)),
+                          );
+                        },
+
                       child: const Text(
                         "Edit",
                         style: TextStyle(
@@ -170,7 +176,7 @@ class _ProfileViewState extends State<ProfileView> {
                         ),
                       ),
                     ),
-                    SizedBox(width: 8), // Add spacing between containers
+                    const SizedBox(width: 8, ), // Add spacing between containers
                     Expanded(
                       flex: 1,
                       child: Container(
@@ -327,7 +333,7 @@ class _ProfileViewState extends State<ProfileView> {
                   ],
                 ),
               ),
-              const SizedBox(height: 25),
+              const SizedBox(height: 35),
               ElevatedButton(
                 onPressed: () {
                   // Implement your logout logic here

@@ -1,21 +1,18 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'dart:io';
-import 'package:image_picker/image_picker.dart';
+import '../Screens/user_profile_screen.dart';
 
-import 'fitnessdetail_screen.dart';
 
 class UpdateProfileScreen extends StatefulWidget {
-  const UpdateProfileScreen({super.key});
+  final String email;
+
+  const UpdateProfileScreen({super.key, required this.email});
 
   @override
   State<UpdateProfileScreen> createState() => _UpdateProfileScreenState();
 }
-Future<void> update() async {
-
-}
 
 class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
-
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   TextEditingController genderController = TextEditingController();
@@ -23,15 +20,32 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   TextEditingController weightController = TextEditingController();
   TextEditingController heightController = TextEditingController();
   late DateTime selectedDate = DateTime.now();
-  late String imagePath;
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
-    imagePath = '';
+    fetchUserData();
   }
-  Future<void> _selectDate(BuildContext context) async {
 
+  Future<void> fetchUserData() async {
+    final userDoc = FirebaseFirestore.instance.collection('Users').doc(widget.email);
+    final userData = await userDoc.get();
+
+    if (userData.exists) {
+      final data = userData.data() as Map<String, dynamic>;
+      setState(() {
+        firstNameController.text = data['First Name'];
+        lastNameController.text = data['Last Name'];
+        genderController.text = data['Gender'];
+        dobController.text = data['Date of Birth'];
+        weightController.text = data['Weight'].toString();
+        heightController.text = data['Height'].toString();
+      });
+    }
+  }
+
+
+  Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: selectedDate,
@@ -45,16 +59,27 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       });
     }
   }
-  Future<void> pickImage() async {
-    final picker = ImagePicker();
-    final pickedfile = await picker.pickImage(source: ImageSource.gallery);
 
-    if (pickedfile != null){
-      setState(() {
-        imagePath = pickedfile.path;
-      });
-    }
+  Future<void> update() async {
+    final userDoc = FirebaseFirestore.instance.collection('Users').doc(widget.email);
+
+    await userDoc.update({
+      'First Name': firstNameController.text,
+      'Last Name': lastNameController.text,
+      'Gender': genderController.text,
+      'Date of Birth': dobController.text,
+      'Weight': double.parse(weightController.text),
+      'Height': double.parse(heightController.text),
+    });
+
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => ProfileView(userEmail: ''))
+    );
+
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -69,42 +94,54 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color(0xFF284494), size: 25,),
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const FitnessLevelScreen()),
+              MaterialPageRoute(builder: (context) => ProfileView(userEmail: '')),
             );
           },
         ),
       ),
-
       body: SingleChildScrollView(
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(1.0),
             child: Column(
               children: [
-
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15.0),
                   child: Column(
                     children: [
-                      GestureDetector(
-                        onTap: pickImage,
-                        child: CircleAvatar(
-                          radius: 55,
-                          backgroundColor: const Color(0xFFEAF3FF),
-                          backgroundImage:
-                          imagePath.isNotEmpty ? FileImage(File(imagePath)) : null,
-                          child: imagePath.isEmpty ? const Icon(Icons.add_a_photo, size:25,):null,
+                      const SizedBox(height: 40,),
+                      RichText(
+                        text: const TextSpan(
+                          text: 'Update Your ',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 20,
+                            fontStyle: FontStyle.italic,
+                          ),
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: 'Profile',
+                              style: TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.bold,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                            TextSpan(
+                              text: ' Here',
+                              style: TextStyle(
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(
-                        height: 18,
-                      ),
+                      const SizedBox(height: 50,),
 
                       TextFormField(
                         controller: firstNameController,
@@ -115,9 +152,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                             )
                         ),
                       ),
-                      const SizedBox(
-                        height: 20,
-                      ),
+                      const SizedBox(height: 20,),
                       TextFormField(
                         controller: lastNameController,
                         decoration: InputDecoration(
@@ -127,14 +162,12 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                             )
                         ),
                       ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-
+                      const SizedBox(height: 20,),
                       Container(
                           decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(15)),
+                              borderRadius: BorderRadius.circular(15)
+                          ),
                           child: Row(
                             children: [
                               Container(
@@ -156,7 +189,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                                       showModalBottomSheet(
                                         context: context,
                                         builder: (BuildContext context) {
-                                          return Container(
+                                          return SizedBox(
                                             height: 200,
                                             child: Column(
                                               children: [
@@ -204,10 +237,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                             ],
                           )
                       ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-
+                      const SizedBox(height: 20,),
                       TextFormField(
                         controller: dobController,
                         decoration: InputDecoration(
@@ -224,31 +254,22 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                         readOnly: true,
                         onTap: () => _selectDate(context),
                       ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-
+                      const SizedBox(height: 20,),
                       Row(
                         children: [
                           Expanded(
                             child: TextFormField(
                               controller: weightController,
                               decoration: InputDecoration(
-                                hintText: "Your Weight",
-                                prefixIcon: const Icon(
-                                  Icons.fitness_center,
-                                  size: 20,
-                                  color: Colors.grey,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15.0),
-                                ),
+                                  hintText: "Weight (kg)",
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  )
                               ),
+                              keyboardType: TextInputType.number,
                             ),
                           ),
-                          const SizedBox(
-                            width: 8,
-                          ),
+                          const SizedBox(width: 8,),
                           Container(
                             width: 50,
                             height: 50,
@@ -262,35 +283,28 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                             child: const Text(
                               "KG",
                               style: TextStyle(
-                                  color: Colors.white, fontSize: 12),
+                                  color: Colors.white, fontSize: 12
+                              ),
                             ),
                           )
                         ],
                       ),
-                      const SizedBox(
-                        height: 20,
-                      ),
+                      const SizedBox(height: 20,),
                       Row(
                         children: [
                           Expanded(
                             child: TextFormField(
                               controller: heightController,
                               decoration: InputDecoration(
-                                hintText: "Your Height",
-                                prefixIcon: const Icon(
-                                  Icons.height,
-                                  size: 20,
-                                  color: Colors.grey,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15.0),
-                                ),
+                                  hintText: "Height (cm)",
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  )
                               ),
+                              keyboardType: TextInputType.number,
                             ),
                           ),
-                          const SizedBox(
-                            width: 8,
-                          ),
+                          const SizedBox(width: 8,),
                           Container(
                             width: 50,
                             height: 50,
@@ -304,14 +318,13 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                             child: const Text(
                               "CM",
                               style: TextStyle(
-                                  color: Colors.white, fontSize: 12),
+                                  color: Colors.white, fontSize: 12
+                              ),
                             ),
                           )
                         ],
                       ),
-                      const SizedBox(
-                        height: 30,
-                      ),
+                      const SizedBox(height: 47,),
                       ElevatedButton(
                         onPressed: update,
                         style: ElevatedButton.styleFrom(
@@ -319,19 +332,15 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
-                          minimumSize: const Size(330, 57
-                          ),
-
+                          minimumSize: const Size(330, 55),
                         ),
-
                         child: const Text(
-                          "Save",
+                          "Edit",
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 21,
                           ),
-
                         ),
                       ),
                     ],
