@@ -19,13 +19,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     return Scaffold(
       body: Column(
         children: [
-          const SizedBox(height: 50),
+          const SizedBox(height: 60),
           Expanded(
             child: Stack(
               children: [
                 CarouselSlider(
                   options: CarouselOptions(
-                    height: 500.0,
+                    height: MediaQuery.of(context).size.height * 0.8,
                     autoPlay: true,
                     enlargeCenterPage: true,
                     viewportFraction: 0.9,
@@ -82,36 +82,35 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           ),
 
           Container(
-            padding: const EdgeInsets.symmetric(
-              vertical:76,
-              horizontal: 20,
+            padding: EdgeInsets.symmetric(
+              vertical: MediaQuery.of(context).size.height * 0.1,
+              horizontal: MediaQuery.of(context).size.width * 0.05,
             ),
-
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   RichText(
                     text: const TextSpan(
-                    style: TextStyle(
-                      fontSize: 24.0,
-                      color: Colors.black
-                    ),
-                    children: [
-                      TextSpan(text: 'Welcome to '),
-                      TextSpan(
-                        text: 'Vitali',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blueAccent,
-                        ),
+                      style: TextStyle(
+                        fontSize: 24.0,
+                        color: Colors.black,
                       ),
-                    ],
+                      children: [
+                        TextSpan(text: 'Welcome to '),
+                        TextSpan(
+                          text: 'Vitali',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueAccent,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  ),
-                   const SizedBox(height: 35,),
+                  const SizedBox(height: 35),
 
-                   ElevatedButton(
+                  ElevatedButton(
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -178,10 +177,11 @@ class CarouselItem extends StatelessWidget {
   final String imagePath;
   final String text;
 
-  const CarouselItem({super.key,
+  const CarouselItem({
+    Key? key,
     required this.imagePath,
     required this.text,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -190,22 +190,21 @@ class CarouselItem extends StatelessWidget {
         Image.asset(
           imagePath,
           fit: BoxFit.cover,
-          height: 391,
+          height: MediaQuery.of(context).size.height * 0.4,
         ),
-        const SizedBox(height: 10,),
+        const SizedBox(height: 10),
         Text(
           text,
-          style:const TextStyle(
-            fontSize:18,
+          style: const TextStyle(
+            fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Colors.black,
-          )
+          ),
         ),
       ],
     );
   }
 }
-
 
 
 
