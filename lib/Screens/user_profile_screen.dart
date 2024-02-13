@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../screen/updateprofile_screen.dart';
+import 'package:vitali/main_tab.dart';
+import 'package:vitali/screen/updateprofile_screen.dart';
+import 'package:vitali/screen/welcome_screen.dart';
 
 class ProfileView extends StatefulWidget {
   final String userEmail;
@@ -54,7 +55,10 @@ class _ProfileViewState extends State<ProfileView> {
           icon: const Icon(Icons.arrow_back),
           color: const Color(0xFF0C2D57),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => MainTabView(userEmail: '', key: UniqueKey(),)),
+            );
           },
         ),
         title: const Text(
@@ -70,10 +74,22 @@ class _ProfileViewState extends State<ProfileView> {
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFFFFFFFF),
+                Color(0xFFDAF0FF),
+                Color(0xFFEAEDF5),
+                Color(0xFFFFFFFF),
+              ],
+            ),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Profile picture and edit button
+
               Row(
                 children: [
                   ClipRRect(
@@ -114,13 +130,14 @@ class _ProfileViewState extends State<ProfileView> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => UpdateProfileScreen(email: email)),
-                          );
-                        },
-
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const UpdateProfileScreen(),
+                          ),
+                        );
+                      },
                       child: const Text(
                         "Edit",
                         style: TextStyle(
@@ -136,7 +153,7 @@ class _ProfileViewState extends State<ProfileView> {
               const SizedBox(
                 height: 15,
               ),
-              // Display user details
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
@@ -176,7 +193,7 @@ class _ProfileViewState extends State<ProfileView> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8, ), // Add spacing between containers
+                    const SizedBox(width: 8),
                     Expanded(
                       flex: 1,
                       child: Container(
@@ -212,7 +229,7 @@ class _ProfileViewState extends State<ProfileView> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8), // Add spacing between containers
+                    const SizedBox(width: 8),
                     Expanded(
                       flex: 1,
                       child: Container(
@@ -255,7 +272,7 @@ class _ProfileViewState extends State<ProfileView> {
               const SizedBox(
                 height: 25,
               ),
-              // Personal details cards
+
               Container(
                 padding:
                     const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
@@ -291,7 +308,7 @@ class _ProfileViewState extends State<ProfileView> {
                 ),
               ),
               const SizedBox(
-                height: 25,
+                height: 30,
               ),
               // Other options cards
               Container(
@@ -336,7 +353,12 @@ class _ProfileViewState extends State<ProfileView> {
               const SizedBox(height: 35),
               ElevatedButton(
                 onPressed: () {
-                  // Implement your logout logic here
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const WelcomeScreen(),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF0C2D57),
@@ -375,7 +397,7 @@ class _ProfileViewState extends State<ProfileView> {
               icon,
               color: const Color(0xFF01AAEC),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 10),
             Text(
               title,
               style: const TextStyle(
