@@ -41,12 +41,10 @@ dependencies:
   firebase_storage:
   firebase_database:
   shared_preferences:
-  carousel_slider: ^4.2.1
   sqflite:
   path:
-
-
-
+  percent_indicator :
+  carousel_slider: ^4.2.1
 
 dev_dependencies:
   flutter_test:
@@ -74,15 +72,15 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - images/vitali.png
+    - images/welcome.png
+    - images/weightlifting.png
+    - images/running.png
     - images/fitnesstraining.png
     - images/logovitali.png
-    - images/running.png
     - images/tick.png
-    - images/vitali.png
-    - images/weightlifting.png
-    - images/welcome.png
-    - images/healthyfood.png
     - images/Firefly fitness app logo 73872.jpg
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
