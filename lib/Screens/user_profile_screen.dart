@@ -133,9 +133,7 @@ class _ProfileViewState extends State<ProfileView> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => const UpdateProfileScreen(),
-                          ),
+                          MaterialPageRoute(builder: (context) => UpdateProfileScreen(email: email)),
                         );
                       },
                       child: const Text(

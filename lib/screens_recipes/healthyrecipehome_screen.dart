@@ -45,6 +45,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
             icon: const Icon(Icons.search),
           ),
         ],
+        automaticallyImplyLeading: false,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
