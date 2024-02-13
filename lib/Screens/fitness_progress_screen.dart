@@ -7,7 +7,7 @@ import 'package:path/path.dart';
 class FitnessProgress extends StatefulWidget {
   final String userEmail;
 
-  FitnessProgress({Key? key, required this.userEmail}) : super(key: key);
+  const FitnessProgress({super.key, required this.userEmail});
 
   @override
   State<FitnessProgress> createState() => _FitnessProgressState();
@@ -61,7 +61,7 @@ class _FitnessProgressState extends State<FitnessProgress> {
         };
       });
     } catch (e) {
-      print('Error fetching data: $e');
+      ('Error fetching data: $e');
     }
   }
 

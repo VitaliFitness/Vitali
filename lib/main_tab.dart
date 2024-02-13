@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:vitali/Screens/fitness_progress_screen.dart';
-import 'package:vitali/Screens/home_screen.dart';
 import 'package:vitali/screens_recipes/healthyrecipehome_screen.dart';
+
+import 'Screens/homeview_screen.dart';
 
 
 class MainTabView extends StatefulWidget {
