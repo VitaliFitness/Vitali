@@ -44,6 +44,10 @@ dependencies:
   carousel_slider: ^4.2.1
   sqflite:
   path:
+  intl:
+  percent_indicator:
+  toast:
+  animations:
 
 
 
@@ -83,6 +87,24 @@ flutter:
     - images/welcome.png
     - images/healthyfood.png
     - images/Firefly fitness app logo 73872.jpg
+    - assets/back.png
+    - assets/beaf-steak.jpg
+    - assets/biceps.png
+    - assets/butter-chicken.jpg
+    - assets/chest.png
+    - assets/dumplings.jpg
+    - assets/explore.png
+    - assets/french-toast.jpg
+    - assets/fruit_granola.jpg
+    - assets/jump_rope.png
+    - assets/Keto_Chicken_Caesar_Salad.jpg
+    - assets/keto_snack.jpg
+    - assets/mexican-pizza.jpg
+    - assets/pesto_pasta.jpg
+    - assets/pullups.png
+    - assets/ramen-noodles.jpg
+    - assets/rowing_machine.png
+    - assets/user.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

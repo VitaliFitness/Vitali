@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'ToastMessage.dart';
 
 
 class FirebaseAuthService {
@@ -17,28 +20,38 @@ class FirebaseAuthService {
       //catch and display any firebase authentication error
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
-        print('Email Already Regsitered');
+        showToast('Email Already Regsitered', context);
       } else if (e.code == 'weak-password') {
 
-        print('Password Should Contain At least 6 Characters');
+        showToast('Password Should Contain At least 6 Characters', context);
       }
     }catch (e) {
-      print('Registration Fail');
+      showToast('Registration Fail', context);
     }
     return null;
 
   }
 
-  Future<User?> signInWithEmailAndPassword(String email, String password) async {
+  Future<User?> signInWithEmailAndPassword(String email, String password, context) async {
 
     try {
       UserCredential credential =await _auth.signInWithEmailAndPassword(email: email, password: password);
       return credential.user;
     } catch (e) {
-      print("Login Failed");
+      showToast("Login Failed", context);
     }
     return null;
 
+  }
+
+  Future<void> signOut(context) async {
+    try {
+      await _auth.signOut();
+      final prefs = await SharedPreferences.getInstance();
+      prefs.remove('Email');
+    } catch (e) {
+      showToast("Logout Failed", context);
+    }
   }
 
 }

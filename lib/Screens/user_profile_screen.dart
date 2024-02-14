@@ -5,6 +5,8 @@ import 'package:vitali/main_tab.dart';
 import 'package:vitali/screen/updateprofile_screen.dart';
 import 'package:vitali/screen/welcome_screen.dart';
 
+import '../firebase_auth_services.dart';
+
 class ProfileView extends StatefulWidget {
   final String userEmail;
 
@@ -350,7 +352,10 @@ class _ProfileViewState extends State<ProfileView> {
               ),
               const SizedBox(height: 35),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  final FirebaseAuthService _auth = FirebaseAuthService();
+                  await _auth.signOut(context);
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(

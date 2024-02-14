@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:vitali/Screens/fitness_progress_screen.dart';
 import 'package:vitali/screens_recipes/healthyrecipehome_screen.dart';
 
-import 'Screens/homeview_screen.dart';
+import 'Dashboard/profile_screen.dart';
+import 'LogScreen/LogScreen.dart';
 
 
 class MainTabView extends StatefulWidget {
@@ -19,7 +20,7 @@ class _MainTabViewState extends State<MainTabView> {
   @override
   void initState() {
     super.initState();
-    currentTab = const HomeView();
+    currentTab =  ProfileScreen();
   }
 
   @override
@@ -40,7 +41,7 @@ class _MainTabViewState extends State<MainTabView> {
                   onPressed: () {
                     setState(() {
                       selectTab = 0;
-                      currentTab = const HomeView();
+                      currentTab = ProfileScreen();
                     });
                   },
                 ),
@@ -51,7 +52,7 @@ class _MainTabViewState extends State<MainTabView> {
                   onPressed: () {
                     setState(() {
                       selectTab = 1;
-                      
+                      currentTab = LogScreen();
                     });
                   },
                 ),

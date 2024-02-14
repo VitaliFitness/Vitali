@@ -31,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         //Authenticate user entered email and password
         final FirebaseAuthService _auth = FirebaseAuthService();
-        User? userFromFirebase = await _auth.signInWithEmailAndPassword(email, password);
+        User? userFromFirebase = await _auth.signInWithEmailAndPassword(email, password, context);
 
         //If user authentication is valid, get the user details
         if (userFromFirebase != null) {
