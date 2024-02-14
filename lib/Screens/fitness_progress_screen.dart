@@ -140,221 +140,223 @@ class _FitnessProgressState extends State<FitnessProgress> {
         ),
         automaticallyImplyLeading: false,
       ),
-      body: Center(
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xFFFFFFFF),
-                Color(0xFFF3FCFF),
-                Color(0xFFFFFFFF),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFFFFFFFF),
+                  Color(0xFFF3FCFF),
+                  Color(0xFFFFFFFF),
+                ],
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                const SizedBox(height: 20),
+                // Add the text here
+                const Center(
+                  child:Text(
+                  'Track Your Progress Here!',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF01AAEC),
+                  ),
+                ),
+                ),
+                const SizedBox(height: 15),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Calories',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 15,),
+                    SizedBox(
+                      height: 200.0,
+                      child: CircularPercentIndicator(
+                        radius: 100.0,
+                        lineWidth: 15.0,
+                        percent: calculatePercent(totalCalories, targetCalories),
+                        center: Text(
+                          '${userData['Calories'] ?? "Loading..."} / $targetCalories',
+                          style: const TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        circularStrokeCap: CircularStrokeCap.round,
+                        progressColor: Colors.blue,
+                        backgroundColor: const Color(0xFFEAEDF5),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 25),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Protein',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 50.0,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15.0),
+                          color: Colors.transparent,
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(25.0),
+                        child: LinearPercentIndicator(
+                          lineHeight: 30.0,
+                          percent: calculatePercent(totalProtein, targetProtein),
+                          center: Text(
+                            '${userData['Protein'] ?? "Loading..."} / $targetProtein',
+                            style: const TextStyle(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          linearGradient: const LinearGradient(
+                            colors: [Color(0xFF2BEEFB), Color(0xFF2BEEFB)],
+                          ),
+                          clipLinearGradient: true,
+                          backgroundColor: const Color(0xFFEAEDF5),
+                          padding: EdgeInsets.zero,
+                        ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 25),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Carbs',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 50.0,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15.0),
+                          color: Colors.transparent,
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(25.0),
+                        child: LinearPercentIndicator(
+                          lineHeight: 30.0,
+                          percent: calculatePercent(totalCarbs, targetCarbs),
+                          center: Text(
+                            '${userData['Carbs'] ?? "Loading..."} / $targetCarbs',
+                            style: const TextStyle(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          linearGradient: const LinearGradient(
+                            colors: [Color(0xFF7B80FF), Color(0xFF7B80FF)],
+                          ),
+                          clipLinearGradient: true,
+                          backgroundColor: const Color(0xFFEAEDF5),
+                          padding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 25),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Fat',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 50.0,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15.0),
+                          color: Colors.transparent,
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(25.0),
+                        child: LinearPercentIndicator(
+                          lineHeight: 30.0,
+                          percent: calculatePercent(totalFat, targetFat),
+                          center: Text(
+                            '${userData['Fat'] ?? "Loading..."} / $targetFat',
+                            style: const TextStyle(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          linearGradient: const LinearGradient(
+                            colors: [Color(0xFF49C8FF), Color(0xFF49C8FF)],
+                          ),
+                          clipLinearGradient: true,
+                          backgroundColor: const Color(0xFFEAEDF5),
+                          padding: EdgeInsets.zero,
+                        ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 25),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProfileView(userEmail: ''),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0C2D57),
+                    elevation: 3,
+                    padding: const EdgeInsets.all(15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  child: const Text(
+                    "View Profile",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
               ],
             ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              const SizedBox(height: 20),
-              // Add the text here
-              const Center(
-                child:Text(
-                'Track Your Progress Here!',
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF01AAEC),
-                ),
-              ),
-              ),
-              const SizedBox(height: 15),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Calories',
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 15,),
-                  SizedBox(
-                    height: 200.0,
-                    child: CircularPercentIndicator(
-                      radius: 100.0,
-                      lineWidth: 15.0,
-                      percent: calculatePercent(totalCalories, targetCalories),
-                      center: Text(
-                        '${userData['Calories'] ?? "Loading..."} / $targetCalories',
-                        style: const TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      circularStrokeCap: CircularStrokeCap.round,
-                      progressColor: Colors.blue,
-                      backgroundColor: const Color(0xFFEAEDF5),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 25),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Protein',
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 50.0,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15.0),
-                        color: Colors.transparent,
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(25.0),
-                      child: LinearPercentIndicator(
-                        lineHeight: 30.0,
-                        percent: calculatePercent(totalProtein, targetProtein),
-                        center: Text(
-                          '${userData['Protein'] ?? "Loading..."} / $targetProtein',
-                          style: const TextStyle(
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        linearGradient: const LinearGradient(
-                          colors: [Color(0xFF2BEEFB), Color(0xFF2BEEFB)],
-                        ),
-                        clipLinearGradient: true,
-                        backgroundColor: const Color(0xFFEAEDF5),
-                        padding: EdgeInsets.zero,
-                      ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 25),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Carbs',
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 50.0,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15.0),
-                        color: Colors.transparent,
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(25.0),
-                      child: LinearPercentIndicator(
-                        lineHeight: 30.0,
-                        percent: calculatePercent(totalCarbs, targetCarbs),
-                        center: Text(
-                          '${userData['Carbs'] ?? "Loading..."} / $targetCarbs',
-                          style: const TextStyle(
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        linearGradient: const LinearGradient(
-                          colors: [Color(0xFF7B80FF), Color(0xFF7B80FF)],
-                        ),
-                        clipLinearGradient: true,
-                        backgroundColor: const Color(0xFFEAEDF5),
-                        padding: EdgeInsets.zero,
-                      ),
-                    ),
-                  ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 25),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Fat',
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 50.0,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15.0),
-                        color: Colors.transparent,
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(25.0),
-                      child: LinearPercentIndicator(
-                        lineHeight: 30.0,
-                        percent: calculatePercent(totalFat, targetFat),
-                        center: Text(
-                          '${userData['Fat'] ?? "Loading..."} / $targetFat',
-                          style: const TextStyle(
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        linearGradient: const LinearGradient(
-                          colors: [Color(0xFF49C8FF), Color(0xFF49C8FF)],
-                        ),
-                        clipLinearGradient: true,
-                        backgroundColor: const Color(0xFFEAEDF5),
-                        padding: EdgeInsets.zero,
-                      ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 25),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ProfileView(userEmail: ''),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0C2D57),
-                  elevation: 3,
-                  padding: const EdgeInsets.all(15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                ),
-                child: const Text(
-                  "View Profile",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
           ),
         ),
       ),

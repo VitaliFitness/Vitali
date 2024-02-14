@@ -30,16 +30,23 @@ class _LatestRecipeScreenState extends State<LatestRecipeScreen> {
       appBar: AppBar(
         title: const Text('Latest Recipes',
           textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.filter_list),
+            icon: const Icon(Icons.filter_list, color: Colors.white),
             onPressed: () {
               _showFilterDialog(context);
             },
           )
         ],
+        backgroundColor: Color(0xFF284494),
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: StreamBuilder<Map<dynamic, dynamic>>(
         stream: _latestRecipesRef.onValue.map((event) => event.snapshot.value as Map<dynamic, dynamic>),

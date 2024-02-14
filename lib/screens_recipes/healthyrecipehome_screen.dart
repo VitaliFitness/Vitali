@@ -33,6 +33,11 @@ class _RecipeScreenState extends State<RecipeScreen> {
       appBar: AppBar(
         title: const Text('Healthy Recipes',
           textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         centerTitle: true,
         actions: [
@@ -42,9 +47,10 @@ class _RecipeScreenState extends State<RecipeScreen> {
               MaterialPageRoute(builder: (context) => const SearchScreen()),
             );
           },
-            icon: const Icon(Icons.search),
+            icon: const Icon(Icons.search, color: Colors.white),
           ),
         ],
+        backgroundColor: Color(0xFF284494),
         automaticallyImplyLeading: false,
       ),
       body: Column(
