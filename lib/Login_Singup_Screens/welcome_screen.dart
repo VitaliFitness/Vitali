@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:vitali/screen/signup_screen.dart';
+import 'package:vitali/Login_Singup_Screens/signup_screen.dart';
 import 'login_screen.dart';
 
 

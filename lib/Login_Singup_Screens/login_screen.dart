@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vitali/screen/signup_screen.dart';
-import 'package:vitali/screen/welcome_screen.dart';
+import 'package:vitali/Login_Singup_Screens/signup_screen.dart';
+import 'package:vitali/Login_Singup_Screens/welcome_screen.dart';
 
 import '../firebase_auth_services.dart';
 import '../main_tab.dart';

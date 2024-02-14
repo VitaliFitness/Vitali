@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../Screens/user_profile_screen.dart';
+import '../ProgressScreen/user_profile_screen.dart';
 
 
 class UpdateProfileScreen extends StatefulWidget {
