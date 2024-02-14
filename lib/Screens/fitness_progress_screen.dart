@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:vitali/Screens/user_profile_screen.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 
 class FitnessProgress extends StatefulWidget {
   final String userEmail;
 
-  const FitnessProgress({super.key, required this.userEmail});
+  const FitnessProgress({Key? key, required this.userEmail}) : super(key: key);
 
   @override
   State<FitnessProgress> createState() => _FitnessProgressState();
@@ -20,16 +22,26 @@ class _FitnessProgressState extends State<FitnessProgress> {
   double totalProtein = 0;
   double totalCarbs = 0;
   double totalFat = 0;
+  late SharedPreferences prefs;
   late String email;
+  double targetCalories = 25000;
+  double targetProtein = 2800;
+  double targetCarbs = 5600;
+  double targetFat = 1400;
 
   @override
   void initState() {
     super.initState();
-    email = 'test@gmail.com';
-    fetchData(email);
+    initializePreferences();
   }
 
-  Future<void> fetchData(String email) async {
+  Future<void> initializePreferences() async {
+    prefs = await SharedPreferences.getInstance();
+    email = prefs.getString('Email') ?? '';
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
     final CollectionReference userDataCollection = FirebaseFirestore.instance
         .collection('User Data')
         .doc(email)
@@ -37,6 +49,7 @@ class _FitnessProgressState extends State<FitnessProgress> {
 
     try {
       QuerySnapshot querySnapshot = await userDataCollection.get();
+
       querySnapshot.docs.forEach((DocumentSnapshot document) {
         Map<String, dynamic>? userData =
         document.data() as Map<String, dynamic>?;
@@ -60,9 +73,7 @@ class _FitnessProgressState extends State<FitnessProgress> {
           'Fat': totalFat,
         };
       });
-    } catch (e) {
-      ('Error fetching data: $e');
-    }
+    } catch (e) {}
   }
 
   Future<void> updateLocalData(Map<String, dynamic> userData) async {
@@ -107,17 +118,22 @@ class _FitnessProgressState extends State<FitnessProgress> {
     };
   }
 
+  double calculatePercent(double consumed, double target) {
+    double percent = consumed / target;
+    return percent.clamp(0.0, 1.0);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFF284494),
         centerTitle: true,
         elevation: 0,
         title: const Text(
           "Progress",
           style: TextStyle(
-            color: Color(0xFF0C2D57),
+            color: Colors.white,
             fontSize: 20,
             fontWeight: FontWeight.w700,
           ),
@@ -133,238 +149,185 @@ class _FitnessProgressState extends State<FitnessProgress> {
               end: Alignment.bottomRight,
               colors: [
                 Color(0xFFFFFFFF),
-                Color(0xFFDAF0FF),
-                Color(0xFFEAEDF5),
+                Color(0xFFF3FCFF),
                 Color(0xFFFFFFFF),
               ],
             ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    "Hi! See Your Progress Records!",
+              const SizedBox(height: 20),
+              // Add the text here
+              const Center(
+                child:Text(
+                'Track Your Progress Here!',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF01AAEC),
+                ),
+              ),
+              ),
+              const SizedBox(height: 15),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Calories',
                     style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Icon(
-                    Icons.scoreboard_rounded,
-                    color: Colors.blue,
+                  const SizedBox(height: 15,),
+                  SizedBox(
+                    height: 200.0,
+                    child: CircularPercentIndicator(
+                      radius: 100.0,
+                      lineWidth: 15.0,
+                      percent: calculatePercent(totalCalories, targetCalories),
+                      center: Text(
+                        '${userData['Calories'] ?? "Loading..."} / $targetCalories',
+                        style: const TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      circularStrokeCap: CircularStrokeCap.round,
+                      progressColor: Colors.blue,
+                      backgroundColor: const Color(0xFFEAEDF5),
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 10,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              const SizedBox(height: 25),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    flex: 1,
-                    child: SizedBox(
-                      height: 250,
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        margin: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFF01AAEC),),
-                          borderRadius: BorderRadius.circular(10),
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Color(0xFF2BEEFB),
-                              Color(0xFF0040FF),
-                              Color(0xFF0C2D57),
-                            ],
-                          ),
-                        ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              const Text(
-                                "Total Calories",
-                                style: TextStyle(
-                                  color: Colors.white54,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                '${userData['Calories']}',
-                                style: const TextStyle(
-                                  color: Color(0xFFFFFFFF),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                  const Text(
+                    'Protein',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Expanded(
-                    flex: 1,
-                    child: SizedBox(
-                      height: 250,
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        margin: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFF90FFF8)),
-                          borderRadius: BorderRadius.circular(10),
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Color(0xFFB1FEFA),
-                              Color(0xFF00C3B8),
-                              Color(0xFF00726B),
-                            ],
+                  SizedBox(
+                    height: 50.0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15.0),
+                        color: Colors.transparent,
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(25.0),
+                      child: LinearPercentIndicator(
+                        lineHeight: 30.0,
+                        percent: calculatePercent(totalProtein, targetProtein),
+                        center: Text(
+                          '${userData['Protein'] ?? "Loading..."} / $targetProtein',
+                          style: const TextStyle(
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              const Text(
-                                "Total Protein",
-                                style: TextStyle(
-                                  color: Colors.white54,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                '${userData['Protein']}',
-                                style: const TextStyle(
-                                  color: Color(0xFFFFFFFF),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
+                        linearGradient: const LinearGradient(
+                          colors: [Color(0xFF2BEEFB), Color(0xFF2BEEFB)],
                         ),
+                        clipLinearGradient: true,
+                        backgroundColor: const Color(0xFFEAEDF5),
+                        padding: EdgeInsets.zero,
+                      ),
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              const SizedBox(height: 25),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    flex: 1,
-                    child: SizedBox(
-                      height: 250,
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        margin: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFF90FFF8)),
-                          borderRadius: BorderRadius.circular(10),
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Color(0xFFB1FEFA),
-                              Color(0xFF00C3B8),
-                              Color(0xFF00726B),
-                            ],
+                  const Text(
+                    'Carbs',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 50.0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15.0),
+                        color: Colors.transparent,
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(25.0),
+                      child: LinearPercentIndicator(
+                        lineHeight: 30.0,
+                        percent: calculatePercent(totalCarbs, targetCarbs),
+                        center: Text(
+                          '${userData['Carbs'] ?? "Loading..."} / $targetCarbs',
+                          style: const TextStyle(
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              const Text(
-                                "Total Carbs",
-                                style: TextStyle(
-                                  color: Colors.white54,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                '${userData['Carbs']}',
-                                style: const TextStyle(
-                                  color: Color(0xFFFFFFFF),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
+                        linearGradient: const LinearGradient(
+                          colors: [Color(0xFF7B80FF), Color(0xFF7B80FF)],
                         ),
+                        clipLinearGradient: true,
+                        backgroundColor: const Color(0xFFEAEDF5),
+                        padding: EdgeInsets.zero,
                       ),
                     ),
                   ),
-                  Expanded(
-                    flex: 1,
-                    child: SizedBox(
-                      height: 250,
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        margin: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFF90FFF8)),
-                          borderRadius: BorderRadius.circular(10),
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Color(0xFF2BEEFB),
-                              Color(0xFF0040FF),
-                              Color(0xFF0C2D57),
-                            ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 25),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Fat',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 50.0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15.0),
+                        color: Colors.transparent,
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(25.0),
+                      child: LinearPercentIndicator(
+                        lineHeight: 30.0,
+                        percent: calculatePercent(totalFat, targetFat),
+                        center: Text(
+                          '${userData['Fat'] ?? "Loading..."} / $targetFat',
+                          style: const TextStyle(
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              const Text(
-                                "Total Fat",
-                                style: TextStyle(
-                                  color: Colors.white54,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                '${userData['Fat']}',
-                                style: const TextStyle(
-                                  color: Color(0xFFFFFFFF),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
+                        linearGradient: const LinearGradient(
+                          colors: [Color(0xFF49C8FF), Color(0xFF49C8FF)],
                         ),
+                        clipLinearGradient: true,
+                        backgroundColor: const Color(0xFFEAEDF5),
+                        padding: EdgeInsets.zero,
+                      ),
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 35),
+              const SizedBox(height: 25),
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(

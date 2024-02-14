@@ -50,12 +50,12 @@ class _ProfileViewState extends State<ProfileView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFF284494),
         centerTitle: true,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          color: const Color(0xFF0C2D57),
+          color: Colors.white,
           onPressed: () {
             Navigator.push(
               context,
@@ -66,7 +66,7 @@ class _ProfileViewState extends State<ProfileView> {
         title: const Text(
           "Profile",
           style: TextStyle(
-            color: Color(0xFF0C2D57),
+            color: Colors.white,
             fontSize: 20,
             fontWeight: FontWeight.w700,
           ),
@@ -135,7 +135,9 @@ class _ProfileViewState extends State<ProfileView> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => UpdateProfileScreen(email: email)),
+                          MaterialPageRoute(
+                            builder: (context) => UpdateProfileScreen(email: email),
+                          ),
                         );
                       },
                       child: const Text(
