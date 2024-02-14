@@ -64,7 +64,7 @@ class _LogBottomSheet extends State<LogBottomSheet> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Text(
+                      Text( //Bottomsheet Title
                         widget.bottomsheetTitle,
                         style: TextStyle(
                           fontSize: 20,
@@ -82,7 +82,7 @@ class _LogBottomSheet extends State<LogBottomSheet> {
                           ),
                         ),
                       ),
-                      TextFormField(
+                      TextFormField( //Search textformfield
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
                           enabledBorder: OutlineInputBorder(
@@ -114,7 +114,7 @@ class _LogBottomSheet extends State<LogBottomSheet> {
                       SizedBox(height: 10),
                       Container(
                         height: MediaQuery.of(context).size.height * 0.5,
-                        child: ListView.builder(
+                        child: ListView.builder( //show all the fetched items from database in List
                             shrinkWrap: true,
                             itemCount: showFilteredResults ? filteredItems.length : items.length,
                             itemBuilder: (BuildContext context, int index) {
@@ -161,11 +161,11 @@ class _LogBottomSheet extends State<LogBottomSheet> {
                                     ),
                                   ],
                                 ),
-                                onTap: () {
+                                onTap: () { //if user tap on an item, show item data bottom sheet
                                   setState(() {
                                     showFilteredResults = false;
-                                    if (widget.bottomsheetTitle == 'Food') {
-                                      showDataBottomSheetForFood(
+                                    if (widget.bottomsheetTitle == 'Food') { //if user is logging for food
+                                      showDataBottomSheetForFood( //call food item data bottom sheet
                                         context,
                                         bottomsheetTitle: name,
                                         mealTime: widget.mealTime,
@@ -177,9 +177,9 @@ class _LogBottomSheet extends State<LogBottomSheet> {
                                         },
                                         updateData: widget.updateData,
                                       );
-                                    } else{
+                                    } else{ //if user is logging for exercise
                                       showFilteredResults = false;
-                                      showDataBottomSheetForExercise(
+                                      showDataBottomSheetForExercise( //call exercise data bottom sheet
                                         context,
                                         bottomsheetTitle: name,
                                         onSelect: (item, count, sessionTime, calories) {

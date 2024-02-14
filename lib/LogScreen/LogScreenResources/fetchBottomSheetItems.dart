@@ -5,20 +5,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 Future<List<Map<String, dynamic>>> fetchItems(String bottomSheetType) async {
   List<Map<String, dynamic>> items = [];
-
   late DataSnapshot snapshot;
   if (bottomSheetType == "Exercise") {
+    //fetch table from realtime database
     snapshot = (await FirebaseDatabase.instance.ref().child('Exercise').get());
     Map<dynamic, dynamic>? data = snapshot.value as Map<dynamic, dynamic>?;
     if (data != null) {
       data.forEach((exerciseKey, exerciseValue) {
         String exerciseName = exerciseKey.toString();
         int calories = exerciseValue['Calories'];
-
-        items.add({'name': exerciseName, 'calories': calories});
-      });
-    }
+        //store the fetched data
+        items.add({'name': exerciseName, 'calories': calories});});}
   } else {
+    //fetch table from the realtime database
     snapshot = (await FirebaseDatabase.instance.ref().child('Food Items').get());
     Map<dynamic, dynamic>? data = snapshot.value as Map<dynamic, dynamic>?;
     if (data != null) {
@@ -32,10 +31,10 @@ Future<List<Map<String, dynamic>>> fetchItems(String bottomSheetType) async {
             double protein = (foodValue['Protein'] ?? 0.0).toDouble();
             double carbs = (foodValue['Carbs'] ?? 0.0).toDouble();
             double fat = (foodValue['Fat'] ?? 0.0).toDouble();
-
-            items.add({'name': name, 'type': type, 'calories': calories, 'count': count, 'protein': protein, 'carbs': carbs, 'fat': fat});
-          });
-        }
+            //store the fetched data
+            items.add({'name': name, 'type': type, 'calories': calories, 'count': count,
+              'protein': protein, 'carbs': carbs, 'fat': fat});
+          });}
       });
     }
   }
@@ -54,14 +53,15 @@ Map<String, dynamic>? getItemData(List<Map<String, dynamic>> items, String name)
 }
 
 Future<void> deleteItem(DateTime logDate, String mealTime, String itemName) async {
+  //get user email
   final prefs = await SharedPreferences.getInstance();
   final email = prefs.getString('Email');
 
   String date = DateFormat('dd-MM-yyyy').format(logDate);
+  //initialize the document in firebase
   final CollectionReference userDataCollection = FirebaseFirestore.instance.collection('User Data');
   final DocumentReference dateDocRef = userDataCollection.doc(email).collection('Dates').doc(date);
 
-  print(dateDocRef);
   try {
     DocumentSnapshot snapshot = await dateDocRef.get();
     if (snapshot.exists) {
@@ -69,7 +69,7 @@ Future<void> deleteItem(DateTime logDate, String mealTime, String itemName) asyn
       if (userData != null) {
         print(mealTime);
         print(itemName);
-        String subcollectionName = '';
+        String subcollectionName = ''; //identify the log to delete
         switch (mealTime) {
           case 'Breakfast':
             subcollectionName = 'Breakfast log';
@@ -89,6 +89,7 @@ Future<void> deleteItem(DateTime logDate, String mealTime, String itemName) asyn
 
         Map<String, dynamic>? items = userData[subcollectionName] as Map<String, dynamic>?;
         if (items != null && items.containsKey(itemName)) {
+          //delete the log
           await dateDocRef.update({
             '$subcollectionName.$itemName': FieldValue.delete(),
           });

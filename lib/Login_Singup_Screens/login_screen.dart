@@ -37,20 +37,17 @@ class _LoginScreenState extends State<LoginScreen> {
         if (userFromFirebase != null) {
           print("User is successfully signedIn");
 
+          //store user email after successfull login
           final prefs = await SharedPreferences.getInstance();
           prefs.setString('Email', email);
 
           Navigator.push(
               context,
               MaterialPageRoute(
-              builder: (context) => MainTabView(key: UniqueKey(), userEmail: '')
-          ),
-          );
-
+              builder: (context) => MainTabView(key: UniqueKey(), userEmail: '')));
         } else {
           print("Some error happend");
         }
-
     }
   }
 

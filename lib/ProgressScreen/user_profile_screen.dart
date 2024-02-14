@@ -355,15 +355,16 @@ class _ProfileViewState extends State<ProfileView> {
               const SizedBox(height: 35),
               ElevatedButton(
                 onPressed: () async {
+                  //call sign out method
                   final FirebaseAuthService _auth = FirebaseAuthService();
                   await _auth.signOut(context);
 
+                  //naivagte user back to welcome screen
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const WelcomeScreen(),
-                    ),
-                  );
+                    ));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF0C2D57),

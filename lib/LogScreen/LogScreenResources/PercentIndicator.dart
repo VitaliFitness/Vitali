@@ -22,7 +22,6 @@ class showPercentIndicator extends StatelessWidget {
     required this.currentFat,
   });
 
-
   @override
   Widget build(BuildContext context) {
     return Column(

@@ -30,8 +30,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     User? user = await _auth.signUpWithEmailAndPassword(context, email, password);
     print(user);
     if (user != null) {
-
-      print('success');
       Navigator.push(
           context, MaterialPageRoute(builder: (_) => SignupDetail(email: email)));
     } else{

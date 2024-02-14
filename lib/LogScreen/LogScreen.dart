@@ -38,12 +38,15 @@ class _LogScreenState extends State<LogScreen> {
   Future<void> fetchData() async {
     String date = DateFormat('dd-MM-yyyy').format(logDate);
 
+    //get the user email
     final prefs = await SharedPreferences.getInstance();
     final email = prefs.getString('Email');
 
+    //intialize the document reference in firebase
     final CollectionReference userDataCollection = FirebaseFirestore.instance.collection('User Data');
     final DocumentReference dateDocRef = userDataCollection.doc(email).collection('Dates').doc(date);
 
+    //fetch the data and store
     try {
       DocumentSnapshot snapshot = await dateDocRef.get();
       if (snapshot.exists) {
@@ -62,7 +65,7 @@ class _LogScreenState extends State<LogScreen> {
           });
         }
       } else {
-        setState(() {
+        setState(() { //if document is empty
           breakfastItems = {};
           lunchItems = {};
           dinnerItems = {};
@@ -80,16 +83,19 @@ class _LogScreenState extends State<LogScreen> {
   }
 
   Future<void> updateData() async {
+    //get the user email
     final prefs = await SharedPreferences.getInstance();
     final email = prefs.getString('Email');
 
     String date = DateFormat('dd-MM-yyyy').format(logDate);
 
+    //initilize the document reference in the firebase
     final CollectionReference userDataCollection = FirebaseFirestore.instance.collection('User Data');
     final DocumentReference userDocRef = userDataCollection.doc(email);
     final CollectionReference dateCollection = userDocRef.collection('Dates');
     final DocumentReference dateDocRef = dateCollection.doc(date);
 
+    //insert the data
     dateDocRef.set({
       'Breakfast log' : breakfastItems,
       'Lunch log': lunchItems,
@@ -118,7 +124,7 @@ class _LogScreenState extends State<LogScreen> {
         appBar: AppBar(
           automaticallyImplyLeading: false,
           title: Center(
-            child: Text(
+            child: Text( //Display date
               DateFormat('E dd').format(logDate),
               style: TextStyle(
                 fontSize: 18,
@@ -128,7 +134,7 @@ class _LogScreenState extends State<LogScreen> {
             ),
           ),
           actions: [
-            IconButton(
+            IconButton( //Calender to allow user to select date
               onPressed: () {
                 _selectDate(context);
               },
@@ -148,7 +154,7 @@ class _LogScreenState extends State<LogScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 30),
-              showPercentIndicator(
+              showPercentIndicator( //call showPercentindicator class to show indicators
                   caloriesPercentage: _calculatePercentage(totalCalories, 1500),
                   proteinPercentage: _calculatePercentage(totalProtein, 100),
                   carbsPercentage: _calculatePercentage(totalCarbs, 200),
@@ -159,37 +165,38 @@ class _LogScreenState extends State<LogScreen> {
                   currentFat: totalFat,
               ),
               SizedBox(height: 50),
+              //call item widgets
               buildItemSection('Breakfast', breakfastItems, (selectedItem, newData) {
                 setState(() {
-                  breakfastItems[selectedItem] = newData;
-                  _updateTotals(newData);
+                  breakfastItems[selectedItem] = newData; //add the user selected item into Map
+                  _updateTotals(newData); //calculate the total gains after item added
                 });
               },
-                updateData,
+                updateData, //call update data method to update the new item in database
               ),
               buildItemSection('Lunch', lunchItems, (selectedItem, newData) {
                 setState(() {
-                  lunchItems[selectedItem] = newData;
-                  _updateTotals(newData);
+                  lunchItems[selectedItem] = newData; //add the user selected item into Map
+                  _updateTotals(newData); //calculate the total gains after item added
                 });
               },
-                updateData,
+                updateData, //call update data method to update the new item in database
               ),
               buildItemSection('Dinner', dinnerItems, (selectedItem, newData) {
                 setState(() {
-                  dinnerItems[selectedItem] = newData;
-                  _updateTotals(newData);
+                  dinnerItems[selectedItem] = newData; //add the user selected item into Map
+                  _updateTotals(newData); //calculate the total gains after item added
                 });
               },
-                updateData,
+                updateData, //call update data method to update the new item in database
               ),
               buildItemSection('Exercise', exercises, (selectedItem, newData) {
                 setState(() {
-                  exercises[selectedItem] = newData;
-                  _updateTotals(newData);
+                  exercises[selectedItem] = newData; //add the user selected item into Map
+                  _updateTotals(newData); //calculate the total gains after item added
                 });
               },
-                updateData,
+                updateData, //call update data method to update the new item in database
               ),
             ]
           )
@@ -198,7 +205,9 @@ class _LogScreenState extends State<LogScreen> {
     );
   }
 
-  Widget buildItemSection(String title, Map<String, Map<String, dynamic>> items, Function(String, Map<String, dynamic>) onSelect, Function() updateData) {
+  //widget to show user selected items
+  Widget buildItemSection(String title, Map<String, Map<String, dynamic>> items,
+      Function(String, Map<String, dynamic>) onSelect, Function() updateData) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -210,7 +219,7 @@ class _LogScreenState extends State<LogScreen> {
           ),
         ),
         Divider(),
-        ListView.builder(
+        ListView.builder( //Read items from the map and show in List
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
           itemCount: items.length,
@@ -219,9 +228,10 @@ class _LogScreenState extends State<LogScreen> {
             Map<String, dynamic> itemData = items[itemName]!;
             print('=======$itemData');
 
-            return GestureDetector(
+            return GestureDetector( //show data bottom sheet if user click on an item
               onTap: () {
                 if (title != 'Exercise') {
+                  //call data bottom sheet for food by passing parameters
                   showDataBottomSheetForFood(
                     context,
                     bottomsheetTitle: itemName,
@@ -243,6 +253,7 @@ class _LogScreenState extends State<LogScreen> {
                       });
                     },
                     updateData: updateData,
+                    //if user click update
                     onUpdate: (calories, protein, carbs, fat){
                       setState(() {
                         updateValues = {
@@ -253,6 +264,7 @@ class _LogScreenState extends State<LogScreen> {
                         };
                       });
                     },
+                    //if user click delete
                     onDelete: (itemName, mealTime, percentages) {
                       setState(() {
                         _deleteFromTotal(percentages);
@@ -264,10 +276,10 @@ class _LogScreenState extends State<LogScreen> {
                           dinnerItems.remove(itemName);
                         }
                       });
-                      print('==============perc===============$percentages');
                     },
                   );
                 } else{
+                  //show data bottom sheet for exercise by passing the parameters
                   showDataBottomSheetForExercise(
                     context,
                     bottomsheetTitle: itemName,
@@ -281,17 +293,16 @@ class _LogScreenState extends State<LogScreen> {
                         'quantity': sessionTime,
                         'calories': calories,
                       });
-                      print(calories);
                     },
                     updateData: updateData,
-                    onUpdate: (calories){
+                    onUpdate: (calories){ //if user click update
                       setState(() {
                         updateValues = {
                           'calories': calories,
                         };
                       });
                     },
-                    onDelete: (itemName, mealTime, percentages) {
+                    onDelete: (itemName, mealTime, percentages) { //if user click delete
                       setState(() {
                         _deleteFromTotal(percentages);
                         if (mealTime == 'Exercise') {
@@ -303,7 +314,7 @@ class _LogScreenState extends State<LogScreen> {
                   );
                 }
               },
-              child: ListTile(
+              child: ListTile( //show data in ListTile
                   title: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -373,7 +384,7 @@ class _LogScreenState extends State<LogScreen> {
           },
         ),
         SizedBox(height:10),
-        LogBottomSheet(
+        LogBottomSheet( //Log bottom sheet to add items
           bottomsheetTitle: title == 'Exercise' ? 'Exercise' : 'Food',
           mealTime: title,
           onSelect: (item, type, count, quantity, calories, protein, carb, fat){
@@ -412,8 +423,7 @@ class _LogScreenState extends State<LogScreen> {
 
   Future<void> _updateTotals(Map<String, dynamic> newData) async {
     setState(() {
-      if (updateValues != null){
-        print('inside update');
+      if (updateValues != null){ //if user update exisitng item data
         totalCalories += updateValues?['calories'] ?? 0.0;
         totalProtein += updateValues?['protein'] ?? 0.0;
         totalCarbs += updateValues?['carbs'] ?? 0.0;
@@ -421,8 +431,7 @@ class _LogScreenState extends State<LogScreen> {
 
         updateValues?.clear();
         updateValues = null;
-      } else {
-        print('inside new');
+      } else { //if user add new item
         totalCalories += newData['calories'] ?? 0.0;
         totalProtein += newData['protein'] ?? 0.0;
         totalCarbs += newData['carbs'] ?? 0.0;

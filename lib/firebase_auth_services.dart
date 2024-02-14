@@ -11,7 +11,6 @@ class FirebaseAuthService {
   FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<User?> signUpWithEmailAndPassword(BuildContext context, String email, String password) async {
-
     try {
       //provide the email and password for firebase authentication
       UserCredential credential =await _auth.createUserWithEmailAndPassword(email: email, password: password);
@@ -29,12 +28,11 @@ class FirebaseAuthService {
       showToast('Registration Fail', context);
     }
     return null;
-
   }
 
   Future<User?> signInWithEmailAndPassword(String email, String password, context) async {
-
     try {
+      //provide the email and password for authentication
       UserCredential credential =await _auth.signInWithEmailAndPassword(email: email, password: password);
       return credential.user;
     } catch (e) {
@@ -47,6 +45,7 @@ class FirebaseAuthService {
   Future<void> signOut(context) async {
     try {
       await _auth.signOut();
+      //remove user email from shared preference
       final prefs = await SharedPreferences.getInstance();
       prefs.remove('Email');
     } catch (e) {

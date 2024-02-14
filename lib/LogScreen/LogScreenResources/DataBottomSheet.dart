@@ -22,13 +22,13 @@ Future<void> showDataBottomSheetForFood(BuildContext context, {
 }) async {
     List<Map<String, dynamic>> items = [];
 
+    //fetch all the food items
     await fetchItems('Food').then((value) {
       items = value;
-      print('===========$items');
     });
 
+    //get only the data for selected item
     Map<String, dynamic>? itemData = await getItemData(items, bottomsheetTitle);
-    print(itemData);
 
     showModalBottomSheet(
       context: context,
@@ -57,6 +57,7 @@ Future<void> showDataBottomSheetForFood(BuildContext context, {
         double initialCarbs = carbs;
         double initialFat = fat;
 
+        //insert the values to local varible if user is performing update
         if (updateCalories != null){
           calories = updateCalories ?? calories;
           protein = updateProtein ?? protein;
@@ -271,14 +272,14 @@ Future<void> showDataBottomSheetForFood(BuildContext context, {
                           borderRadius: BorderRadius.circular(5),
                         ),
                         child: TextFormField(
+                          //show exisiting quantity if user is updating, else '1'
                           initialValue: updateQuantity != null ? updateQuantity.toString() : '1',
-                          onChanged: (value) {
+                          onChanged: (value) { //when user enter a quantity
                             if (value.isNotEmpty && int.tryParse(value) != null) {
                               setState(() {
                                 quantity = int.parse(value);
-                                print(quantity);
 
-                                if(quantity != 0) {
+                                if(quantity != 0) { //calculate the total gains
                                   int totalCalories = initialCalories * quantity;
                                   double totalProtein = initialProtein * quantity;
                                   double totalCarbs = initialCarbs * quantity;
@@ -306,12 +307,14 @@ Future<void> showDataBottomSheetForFood(BuildContext context, {
                         child: Text(
                             'Quantity', style: TextStyle(color: Colors.black))),
                     SizedBox(height: 20),
-                    Visibility(
+                    Visibility( //if user is adding new item to log
                     visible: updateCalories == null,
                       child: TextButton(
                         onPressed: () async {
                           Navigator.pop(context);
+                          //pass the user selected data
                           await onSelect(bottomsheetTitle, count, quantity, calories, protein, carbs, fat);
+                          //call the update method to update the data in database
                           await updateData();
                         },
                         style: ElevatedButton.styleFrom(
@@ -334,25 +337,25 @@ Future<void> showDataBottomSheetForFood(BuildContext context, {
                         ),
                       ),
                     ),
-                    Visibility(
+                    Visibility( //if user is updating data
                       visible: updateCalories != null,
                       child: Row(
                         children: [
                           Expanded(
                             child: TextButton(
                               onPressed: () async {
+                                //get the gains to be updated in total gains
                                 int updatedCalories = calories - (updateCalories ?? 0);
                                 double updatedProtein = protein - (updateProtein ?? 0);
                                 double updatedCarbs = carbs - (updateCarbs ?? 0);
                                 double updatedFat = fat - (updateFat ?? 0);
-                                print(calories);
-                                print(updatedCalories);
-                                print('on dbts : $updatedCalories');
 
                                 Navigator.pop(context);
+                                //pass the updated gains for calculation
                                 onUpdate!(updatedCalories, updatedProtein, updatedCarbs, updatedFat);
+                                //pass the updated gains for database
                                 await onSelect(bottomsheetTitle, count, quantity, calories, protein, carbs, fat);
-                                await updateData();
+                                await updateData(); //call update method to update in database
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Color(0xFF284494),
@@ -373,7 +376,9 @@ Future<void> showDataBottomSheetForFood(BuildContext context, {
                           IconButton(
                             onPressed: ()  async {
                             Navigator.pop(context);
+                            //delete the item log from database
                             await deleteItem(updateDate!, mealTime, bottomsheetTitle);
+                            //pass the deleted gains
                             await onDelete!(bottomsheetTitle, mealTime, {
                               'calories': updateCalories,
                               'protein': updateProtein,
@@ -415,13 +420,13 @@ Future<void> showDataBottomSheetForExercise(BuildContext context, {
 }) async {
   List<Map<String, dynamic>> items = [];
 
+  //call the method to fetch all the items from database
   await fetchItems('Exercise').then((value) {
     items = value;
-    print('===========$items');
   });
 
+  //get the data for only user selected exercise
   Map<String, dynamic>? itemData = await getItemData(items, bottomsheetTitle);
-  print(itemData);
 
   String lastDropdownValue = updateLastDropdownValue != null ? updateLastDropdownValue : 'Min';
 
@@ -430,7 +435,8 @@ Future<void> showDataBottomSheetForExercise(BuildContext context, {
     isScrollControlled: true,
     builder: (BuildContext context) {
       String dropdownValue = lastDropdownValue;
-      TextEditingController sessionTime = TextEditingController(text: updateSessionTime != null ? updateSessionTime : lastDropdownValue == 'Hrs' ? '1' : '30');
+      TextEditingController sessionTime = TextEditingController(text:
+      updateSessionTime != null ? updateSessionTime : lastDropdownValue == 'Hrs' ? '1' : '30');
 
       int calories = 0;
 
@@ -604,12 +610,13 @@ Future<void> showDataBottomSheetForExercise(BuildContext context, {
                     ],
                   ),
                   SizedBox(height: 20),
-                  Visibility(
+                  Visibility( //if user adding an exercise
                     visible: updateCalories == null,
                     child: TextButton(
                       onPressed: () async {
+                        //pass the user selected exercise data
                         await onSelect(bottomsheetTitle, lastDropdownValue, sessionTime.text, calories);
-                        await updateData();
+                        await updateData(); //update the user selected data in database
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
@@ -631,7 +638,7 @@ Future<void> showDataBottomSheetForExercise(BuildContext context, {
                       ),
                     ),
                   ),
-                  Visibility(
+                  Visibility( //if user updating an exercise
                     visible: updateCalories != null,
                     child: Row(
                       children: [
@@ -639,10 +646,10 @@ Future<void> showDataBottomSheetForExercise(BuildContext context, {
                           child: TextButton(
                             onPressed: () async {
                               int updatedCalories = calories - (updateCalories ?? 0);
-
-                              onUpdate!(updatedCalories);
+                              onUpdate!(updatedCalories); //pass the updated calories
+                              //pass the user updated exercise data
                               await onSelect(bottomsheetTitle, lastDropdownValue, sessionTime.text, calories);
-                              await updateData();
+                              await updateData(); //update data in database
                               Navigator.pop(context);
                             },
                             style: ElevatedButton.styleFrom(
@@ -667,11 +674,13 @@ Future<void> showDataBottomSheetForExercise(BuildContext context, {
                         IconButton(
                           onPressed: ()  async {
                             Navigator.pop(context);
+                            //delete the log from database
                             await deleteItem(updateDate!, 'Exercise', bottomsheetTitle);
+                            //pass the deleted data
                             await onDelete!(bottomsheetTitle, 'Exercise', {
                               'calories': updateCalories,
                             });
-                            await updateData();
+                            await updateData(); //update in database
                           },
                           icon: Icon(
                             Icons.delete,

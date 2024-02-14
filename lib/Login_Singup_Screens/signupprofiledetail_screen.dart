@@ -26,6 +26,7 @@ class _SignupDetailState extends State<SignupDetail> {
   late String imagePath;
 
   Future<void> save(String signupEmail) async {
+    //instanciate the firestore
     final firestore = FirebaseFirestore.instance.collection('Users');
 
     String fname = firstNameController.text;
@@ -36,6 +37,7 @@ class _SignupDetailState extends State<SignupDetail> {
     double weight = double.parse(weightController.text);
     double height = double.parse(heightController.text);
 
+    //create the document in firestore
     firestore.doc(email).set({
       'First Name' : fname,
       'Last Name' : lname,
@@ -51,7 +53,6 @@ class _SignupDetailState extends State<SignupDetail> {
       print('Registering User Details Failed');
       print((error, stackTrace));
     });
-
     Navigator.push(
         context, MaterialPageRoute(builder: (_) => const LoginScreen()));
   }
